@@ -1,36 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { E_ATTENDANCE_DEPLOY_URL } from "@env";
 
-const API_URL = "https://e-attendance-backend.onrender.com";
+const API_URL = E_ATTENDANCE_DEPLOY_URL;
 
 if (!API_URL) {
   throw new Error("API is not defined");
 }
 
-const getUSerData = async () => {
-  try {
-    const result = await AsyncStorage.multiGet([
-      "token",
-      "userId",
-      "profile",
-      "email",
-    ]);
-    const data = {};
-    result.forEach(([key, value]) => {
-      data[key] = value;
-    });
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+const getUserData = () => {
+  return AsyncStorage.getItem("userData").then((data) => {
+    if (data) {
+      return JSON.parse(data);
+      console.log(data);
+    }
+    return null;
+  });
 };
 
-let userToken, userId, userProfile, userEmail;
-
-getUSerData().then((data) => {
-  userToken = data.token;
-  userId = data.userId;
-  userProfile = data.profile;
-  userEmail = data.email;
-});
-
-export { API_URL, userToken, userId, userProfile, userEmail };
+export { getUserData, API_URL };
