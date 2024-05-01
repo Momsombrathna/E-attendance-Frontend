@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { withAuthProtection } from "./src/context/AuthContext";
+import withAuthProtection from "./src/context/AuthContext";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import Classes from "./src/pages/Classes";
 import Settings from "./src/pages/Settings";
 import Profile from "./src/pages/Profile";
 import Login from "./src/pages/auth/Login";
+import Register from "./src/pages/auth/Register";
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Protected" component={ProtectedComponent} />
       </Stack.Navigator>
     </NavigationContainer>
