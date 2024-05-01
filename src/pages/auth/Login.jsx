@@ -110,7 +110,6 @@ export default function Login() {
               textAlign: "center",
               width: "100%",
               marginBottom: 16,
-              cursor: "pointer",
             }}
           >
             Don't have an account? &nbsp;
@@ -120,7 +119,6 @@ export default function Login() {
               }}
               style={{
                 color: "#007bff",
-                cursor: "pointer",
               }}
             >
               Sign up
