@@ -33,11 +33,12 @@ function TabNavigator() {
           // You can return any component that you like here!
           return <Icon name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: "#2F3791",
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          backgroundColor: "#fff",
+        },
       })}
-      tabBarOptions={{
-        activeTintColor: "#2F3791",
-        inactiveTintColor: "gray",
-      }}
     >
       <Tab.Screen name="Classes" component={Classes} />
       <Tab.Screen name="Profile" component={Profile} />
