@@ -24,50 +24,62 @@ export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigation = useNavigation();
 
-  function handleSubmit() {
+  const handleLogin = async () => {
     setLoading(true);
     setError("");
 
-    fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((data) => {
-            throw new Error(data.message);
-          });
-        }
+    if (!username || !password) {
+      setError("Username and password are required");
+      setLoading(false);
+      return;
+    }
 
-        return response.json();
-      })
-      .then((result) => {
-        setLoading(false);
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
 
-        const expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + 30); // Set the expiration date to 30 days from now
-
-        const data = {
-          token: result.user.tokens[result.user.tokens.length - 1],
-          username: result.user.username,
-          userId: result.user._id,
-          email: result.user.email,
-          profile: result.user.profile,
-          expirationDate: expirationDate.toISOString(), // Convert the expiration date to a string
-        };
-
-        AsyncStorage.setItem("userData", JSON.parse(data));
-
-        navigation.navigate("Protected");
-      })
-      .catch((error) => {
-        setLoading(false);
-        setError(error.message);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
       });
-  }
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message);
+      }
+
+      const Data = await response.json();
+
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + 7); // Set the expiration date to 30 days from now
+
+      const userData = {
+        token: Data.user.tokens[Data.user.tokens.length - 1],
+        username: Data.user.username,
+        userId: Data.user._id,
+        email: Data.user.email,
+        profile: Data.user.profile,
+        expirationDate: expirationDate.toISOString(), // Convert the expiration date to a string
+      };
+
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      console.log(userData);
+      navigation.replace("Protected");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -122,13 +134,7 @@ export default function Login() {
           </Text>
           <TouchableOpacity
             style={styles.btn}
-            onPress={
-              username && password
-                ? () => {
-                    handleSubmit();
-                  }
-                : null
-            }
+            onPress={handleLogin}
             disabled={loading}
           >
             {loading ? (
