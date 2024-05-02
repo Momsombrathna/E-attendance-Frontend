@@ -8,13 +8,13 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  Pressable,
 } from "react-native";
-import { login } from "../../context/AuthContext";
 import Logo from "../../../assets/e-attendance.png";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
+import { API_URL } from "../../api/config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -24,23 +24,61 @@ export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setLoading(true);
+    setError("");
 
     if (!username || !password) {
-      setLoading(false);
-      setError("Please enter your username and password");
-      return;
-    }
-
-    if (Object.keys(error).length > 0) {
-      setError("");
+      setError("Username and password are required");
       setLoading(false);
       return;
     }
 
-    login(username, password, setLoading, setError, navigation);
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message);
+      }
+
+      const Data = await response.json();
+
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + 7); // Set the expiration date to 30 days from now
+
+      const userData = {
+        token: Data.user.tokens[Data.user.tokens.length - 1],
+        username: Data.user.username,
+        userId: Data.user._id,
+        email: Data.user.email,
+        profile: Data.user.profile,
+        expirationDate: expirationDate.toISOString(), // Convert the expiration date to a string
+      };
+
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      console.log(userData);
+      navigation.replace("Protected");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,18 +90,20 @@ export default function Login() {
           </View>
           <Text style={styles.header}>Welcome Back.</Text>
           <View style={styles.viewsContainer}>
+            <Text style={styles.label}>Email</Text>
             <View style={[styles.inputContainer, error && styles.inputError]}>
               <TextInput
                 style={styles.inputUsername}
                 value={username}
                 onChangeText={setUsername}
-                placeholder="Username"
+                placeholder="Username or Email"
               />
             </View>
             {error && <Text style={styles.errorText}>{error}</Text>}
           </View>
 
           <View style={styles.viewsContainers}>
+            <Text style={styles.label}>Password</Text>
             <View style={[styles.inputContainer, error && styles.inputError]}>
               <TextInput
                 style={styles.inputPassword}
@@ -92,7 +132,7 @@ export default function Login() {
           >
             Forgot password?
           </Text>
-          <Pressable
+          <TouchableOpacity
             style={styles.btn}
             onPress={handleLogin}
             disabled={loading}
@@ -102,7 +142,7 @@ export default function Login() {
             ) : (
               <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
             )}
-          </Pressable>
+          </TouchableOpacity>
 
           <Text
             style={{
@@ -115,13 +155,14 @@ export default function Login() {
             Don't have an account? &nbsp;
             <Text
               onPress={() => {
-                navigation.navigate("Signup");
+                navigation.navigate("Register");
               }}
               style={{
-                color: "#007bff",
+                color: "#2F3791",
+                opacity: 0.9,
               }}
             >
-              Sign up
+              Sign up.
             </Text>
           </Text>
         </View>
@@ -195,6 +236,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     width: "100%",
     marginBottom: 16,
+    marginTop: 10,
   },
   viewsContainer: {
     width: "100%",
@@ -209,15 +251,26 @@ const styles = StyleSheet.create({
     borderColor: "red",
   },
   errorText: {
+    fontSize: 12,
     color: "red",
     position: "absolute",
-    bottom: -3,
-    paddingLeft: 10,
+    bottom: -1,
+    paddingLeft: 5,
   },
   errorTexts: {
+    fontSize: 12,
     color: "red",
     position: "absolute",
-    bottom: -3,
-    paddingLeft: 10,
+    bottom: -1,
+    paddingLeft: 5,
+  },
+
+  label: {
+    width: "90%",
+    textAlign: "left",
+    color: "#2F3791",
+    fontSize: 16,
+    paddingLeft: 5,
+    marginBottom: 5,
   },
 });
