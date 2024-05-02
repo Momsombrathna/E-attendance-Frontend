@@ -23,12 +23,14 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
   const navigation = useNavigation();
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     setLoading(true);
     setError("");
 
@@ -39,43 +41,43 @@ export default function Register() {
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setPasswordError("Passwords do not match");
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+      setPasswordError("Password must be at least 6 characters long");
       setLoading(false);
       return;
     }
 
     if (!email.includes("@")) {
-      setError("Invalid email address");
+      setEmailError("Invalid email address");
       setLoading(false);
       return;
     }
 
     if (!email.includes(".")) {
-      setError("Invalid email address");
+      setEmailError("Invalid email address");
       setLoading(false);
       return;
     }
 
     if (!password.match(/[0-9]/)) {
-      setError("Password must contain at least one number");
+      setPasswordError("Password must contain at least one number");
       setLoading(false);
       return;
     }
 
     if (!password.match(/[a-z]/)) {
-      setError("Password must contain at least one lowercase letter");
+      setPasswordError("Password must contain at least one lowercase letter");
       setLoading(false);
       return;
     }
 
     if (!password.match(/[A-Z]/)) {
-      setError("Password must contain at least one uppercase letter");
+      setPasswordError("Password must contain at least one uppercase letter");
       setLoading(false);
       return;
     }
@@ -98,16 +100,6 @@ export default function Register() {
       })
       .then((result) => {
         setLoading(false);
-        // console.log(result);
-        // Save the token in the async storage
-        AsyncStorage.setItem(
-          "token",
-          result.user.tokens[result.user.tokens.length - 1]
-        );
-        AsyncStorage.setItem("username", result.user.username);
-        AsyncStorage.setItem("userId", result.user._id);
-        AsyncStorage.setItem("email", result.user.email);
-        AsyncStorage.setItem("profile", result.user.profile);
 
         navigation.navigate("Protected");
       })
@@ -115,94 +107,90 @@ export default function Register() {
         setLoading(false);
         setError(error.message);
       });
-  }
+  };
 
   return (
     <View style={styles.container}>
       <Image source={Logo} style={styles.logo} />
       <Text style={styles.title}>Register Account</Text>
       <Text style={styles.label}>Username</Text>
-      <TextInput
-        style={[styles.input, error && styles.inputError]}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
 
-      {error && error.message && error.message.includes("username") ? (
-        <Text style={styles.error}>{error.message}</Text>
-      ) : null}
+        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+      </View>
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={[styles.input, error && styles.inputError]}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      {error && error.message && error.message.includes("email") ? (
-        <Text style={styles.error}>{error.message}</Text>
-      ) : null}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+      </View>
 
       {/* password */}
       <Text style={styles.label}>Password</Text>
-      <View style={[styles.passwordContainer, error && styles.inputError]}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!isPasswordVisible}
-        />
-        <TouchableOpacity
-          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          style={styles.icon}
-        >
-          <Icon
-            name={isPasswordVisible ? "eye-slash" : "eye"}
-            size={20}
-            color="gray"
+      <View style={styles.inputContainer}>
+        <View style={[styles.passwordContainer, error && styles.inputError]}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            style={styles.icon}
+          >
+            <Icon
+              name={isPasswordVisible ? "eye-slash" : "eye"}
+              size={20}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
+        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
       </View>
-      {error && error.message && error.message.includes("password") ? (
-        <Text style={styles.error}>{error.message}</Text>
-      ) : null}
 
       {/* confirm password */}
       <Text style={styles.label}>Confirm Password</Text>
-      <View style={[styles.passwordContainer, error && styles.inputError]}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!isConfirmPasswordVisible}
-        />
-        <TouchableOpacity
-          onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-          style={styles.icon}
-        >
-          <Icon
-            name={isConfirmPasswordVisible ? "eye-slash" : "eye"}
-            size={20}
-            color="gray"
+      <View style={styles.inputContainer}>
+        <View style={[styles.passwordContainer, error && styles.inputError]}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!isConfirmPasswordVisible}
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+            }
+            style={styles.icon}
+          >
+            <Icon
+              name={isConfirmPasswordVisible ? "eye-slash" : "eye"}
+              size={20}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
+        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
       </View>
-      {error && error.message && error.message.includes("confirmPassword") ? (
-        <Text style={styles.error}>{error.message}</Text>
-      ) : null}
 
       <TouchableOpacity
         style={styles.btn}
-        onPress={
-          username && password && email
-            ? () => {
-                handleSubmit();
-              }
-            : null
-        }
+        onPress={handleSubmit}
         disabled={loading}
       >
         {loading ? (
@@ -260,8 +248,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: "#fff",
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 2,
+    marginBottom: 20,
     padding: 8,
   },
   passwordContainer: {
@@ -274,7 +262,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
     height: 50,
-    marginTop: 8,
+    marginTop: 2,
+    marginBottom: 20,
   },
   passwordInput: {
     flex: 1,
@@ -310,5 +299,19 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: "red",
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: 11,
+    width: "90%",
+    textAlign: "left",
+    paddingLeft: 5,
+    position: "absolute",
+    bottom: -0,
+  },
+  inputContainer: {
+    width: "100%",
+    alignItems: "center",
+    position: "relative",
   },
 });

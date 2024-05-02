@@ -73,7 +73,10 @@ export default function Login() {
 
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
       console.log(userData);
-      navigation.replace("Protected");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
     } catch (error) {
       setError(error.message);
     } finally {
