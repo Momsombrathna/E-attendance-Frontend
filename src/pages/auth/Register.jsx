@@ -8,13 +8,15 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  Platform,
+  ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import Logo from "../../../assets/e-attendance.png";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
 import { API_URL } from "../../api/config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -30,12 +32,14 @@ export default function Register() {
     useState(false);
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
+  const handleRegister = async () => {
     setLoading(true);
-    setError("");
+    setError(null);
+    setEmailError(null);
+    setPasswordError(null);
 
-    if (!password || !email || !username || !confirmPassword) {
-      setError("Please fill in all the fields");
+    if (!email || !password || !username || !confirmPassword) {
+      setError("All fields are required");
       setLoading(false);
       return;
     }
@@ -46,75 +50,96 @@ export default function Register() {
       return;
     }
 
-    if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
-      setLoading(false);
-      return;
-    }
-
-    if (!email.includes("@")) {
+    if (!email.includes("@") || !email.includes(".")) {
       setEmailError("Invalid email address");
       setLoading(false);
       return;
     }
 
-    if (!email.includes(".")) {
-      setEmailError("Invalid email address");
+    if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters");
       setLoading(false);
       return;
     }
 
-    if (!password.match(/[0-9]/)) {
-      setPasswordError("Password must contain at least one number");
-      setLoading(false);
-      return;
-    }
-
-    if (!password.match(/[a-z]/)) {
-      setPasswordError("Password must contain at least one lowercase letter");
-      setLoading(false);
-      return;
-    }
-
-    if (!password.match(/[A-Z]/)) {
-      setPasswordError("Password must contain at least one uppercase letter");
-      setLoading(false);
-      return;
-    }
-
-    fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password, email }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((data) => {
-            throw new Error(data.message);
-          });
-        }
-
-        return response.json();
-      })
-      .then((result) => {
-        setLoading(false);
-
-        navigation.navigate("Protected");
-      })
-      .catch((error) => {
-        setLoading(false);
-        setError(error.message);
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        username,
+        email,
+        password,
       });
-  };
 
+      // Call the OTP API after successful registration
+      const otpResponse = await axios.post(`${API_URL}/auth/email-otp`, {
+        email,
+      });
+
+      navigation.navigate("VerifyEmail", { email });
+    } catch (error) {
+      if (error.response) {
+        // Check the status code
+        switch (error.response.status) {
+          case 400:
+            // Handle 400 error
+            setError("Bad request. Please check your input");
+            break;
+          case 409:
+            // Handle 409 error
+            setError("User already exists. Please login");
+            break;
+          case 404:
+            // Handle 404 error
+            setError("User not found. Please register");
+            break;
+          case 403:
+            // Handle 403 error
+            setError("Forbidden. Please check your credentials");
+            break;
+          case 429:
+            // Handle 429 error
+            setError("Too many requests. Please try again later");
+            break;
+
+          case 401:
+            // Handle 401 error
+            setError("Unauthorized. Please check your credentials");
+            break;
+          case 500:
+            // Handle 500 error
+            setError("Server error. Please try again later");
+            break;
+          default:
+            // Handle other errors
+            setError("An error occurred. Please try again");
+            break;
+        }
+      } else if (error.request) {
+        setError("An error occurred. Please try again");
+      } else {
+        setError("An error occurred. Please try again");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <View style={styles.container}>
-      <Image source={Logo} style={styles.logo} />
-      <Text style={styles.title}>Register Account</Text>
-      <Text style={styles.label}>Username</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View
+        style={{
+          alignItems: "center",
+          width: "100%",
+          marginBottom: 16,
+        }}
+      >
+        <Image source={Logo} style={styles.logo} />
+        <Text style={styles.title}>Register Account</Text>
+      </View>
+
       <View style={styles.inputContainer}>
+        <Text style={styles.label}>Username</Text>
         <TextInput
           style={[styles.input, error && styles.inputError]}
           placeholder="Username"
@@ -128,18 +153,23 @@ export default function Register() {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          style={[styles.input, error && styles.inputError]}
+          style={[styles.input, emailError && styles.inputError]}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
         />
-        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+        {emailError ? (
+          <Text style={styles.errorMessage}>{emailError}</Text>
+        ) : null}
       </View>
 
       {/* password */}
-      <Text style={styles.label}>Password</Text>
+
       <View style={styles.inputContainer}>
-        <View style={[styles.passwordContainer, error && styles.inputError]}>
+        <Text style={styles.label}>Password</Text>
+        <View
+          style={[styles.passwordContainer, passwordError && styles.inputError]}
+        >
           <TextInput
             style={styles.passwordInput}
             placeholder="Password"
@@ -158,13 +188,18 @@ export default function Register() {
             />
           </TouchableOpacity>
         </View>
-        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+        {passwordError ? (
+          <Text style={styles.errorMessage}>{passwordError}</Text>
+        ) : null}
       </View>
 
       {/* confirm password */}
-      <Text style={styles.label}>Confirm Password</Text>
+
       <View style={styles.inputContainer}>
-        <View style={[styles.passwordContainer, error && styles.inputError]}>
+        <Text style={styles.label}>Confirm Password</Text>
+        <View
+          style={[styles.passwordContainer, passwordError && styles.inputError]}
+        >
           <TextInput
             style={styles.passwordInput}
             placeholder="Confirm Password"
@@ -185,42 +220,53 @@ export default function Register() {
             />
           </TouchableOpacity>
         </View>
+        {passwordError ? (
+          <Text style={styles.errorMessage}>{passwordError}</Text>
+        ) : null}
         {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
       </View>
 
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={handleSubmit}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={{ color: "#fff", textAlign: "center" }}>Register</Text>
-        )}
-      </TouchableOpacity>
-      <Text
+      <View
         style={{
-          color: "gray",
-          textAlign: "center",
           width: "100%",
-          marginTop: 16,
+          alignItems: "center",
+          position: "relative",
         }}
       >
-        Already have an account? &nbsp;
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={handleRegister}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={{ color: "#fff", textAlign: "center" }}>Register</Text>
+          )}
+        </TouchableOpacity>
         <Text
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
           style={{
-            color: "#2F3791",
-            opacity: 0.9,
+            color: "gray",
+            textAlign: "center",
+            width: "100%",
+            marginTop: 16,
           }}
         >
-          Log in.
+          Already have an account? &nbsp;
+          <Text
+            onPress={() => {
+              navigation.navigate("Login");
+            }}
+            style={{
+              color: "#2F3791",
+              opacity: 0.9,
+            }}
+          >
+            Log in.
+          </Text>
         </Text>
-      </Text>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -238,13 +284,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 16,
+    opacity: 0.9,
     color: "#2F3791",
   },
   input: {
     width: "90%",
     height: 50,
-    borderColor: "gray",
+    borderColor: "#2F3791",
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: "#fff",
@@ -257,7 +305,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 2,
-    borderColor: "gray",
+    borderColor: "#2F3791",
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: "#fff",
@@ -296,6 +344,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingLeft: 5,
     marginTop: 5,
+    opacity: 0.9,
   },
   inputError: {
     borderColor: "red",

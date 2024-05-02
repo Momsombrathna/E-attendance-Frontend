@@ -12,74 +12,12 @@ import Settings from "./src/pages/Settings";
 import Profile from "./src/pages/Profile";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
+import VerifyEmail from "./src/pages/auth/verifyOtp/VerifyEmail";
+import ForgotPass from "./src/pages/auth/resetPass/ForgotPass";
 
 const Stack = createStackNavigator();
 
 const Tab = createBottomTabNavigator();
-
-function CustomTabBar({ state, descriptors, navigation }) {
-  return (
-    <View style={styles.container}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
-
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
-          <TouchableOpacity key={index} onPress={onPress} style={styles.tab}>
-            <View style={isFocused ? styles.activeTab : null}>
-              <Icon
-                name={iconName}
-                size={30}
-                color={isFocused ? "#2F3791" : "gray"}
-              />
-              <Text style={{ color: isFocused ? "#2F3791" : "gray" }}>
-                {label}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-  },
-  tab: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    borderTopColor: "#2F3791",
-    borderTopWidth: 1,
-  },
-  activeTab: {
-    borderTopColor: "#2F3791",
-    borderTopWidth: 2,
-  },
-});
 
 function TabNavigator() {
   return (
@@ -123,10 +61,11 @@ export default function App() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Home" component={ProtectedComponent} />
-
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
+        <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen name="Home" component={ProtectedComponent} />
       </Stack.Navigator>
     </NavigationContainer>
   );
