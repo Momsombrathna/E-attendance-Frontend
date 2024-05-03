@@ -69,55 +69,26 @@ export default function Register() {
         password,
       });
 
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message);
+        throw new Error(result.message);
+      }
+
       // Call the OTP API after successful registration
       const otpResponse = await axios.post(`${API_URL}/auth/email-otp`, {
         email,
       });
 
+      if (!otpResponse.ok) {
+        setError(otpResponse.message);
+        throw new Error(otpResponse.message);
+      }
+
       navigation.navigate("VerifyEmail", { email });
     } catch (error) {
-      if (error.response) {
-        // Check the status code
-        switch (error.response.status) {
-          case 400:
-            // Handle 400 error
-            setError("Bad request. Please check your input");
-            break;
-          case 409:
-            // Handle 409 error
-            setError("User already exists. Please login");
-            break;
-          case 404:
-            // Handle 404 error
-            setError("User not found. Please register");
-            break;
-          case 403:
-            // Handle 403 error
-            setError("Forbidden. Please check your credentials");
-            break;
-          case 429:
-            // Handle 429 error
-            setError("Too many requests. Please try again later");
-            break;
-
-          case 401:
-            // Handle 401 error
-            setError("Unauthorized. Please check your credentials");
-            break;
-          case 500:
-            // Handle 500 error
-            setError("Server error. Please try again later");
-            break;
-          default:
-            // Handle other errors
-            setError("An error occurred. Please try again");
-            break;
-        }
-      } else if (error.request) {
-        setError("An error occurred. Please try again");
-      } else {
-        setError("An error occurred. Please try again");
-      }
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -241,7 +212,11 @@ export default function Register() {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={{ color: "#fff", textAlign: "center" }}>Register</Text>
+            <Text
+              style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}
+            >
+              Register
+            </Text>
           )}
         </TouchableOpacity>
         <Text

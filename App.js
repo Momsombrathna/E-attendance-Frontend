@@ -14,6 +14,8 @@ import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
 import VerifyEmail from "./src/pages/auth/verifyOtp/VerifyEmail";
 import ForgotPass from "./src/pages/auth/resetPass/ForgotPass";
+import VerifyEmailResetPass from "./src/pages/auth/resetPass/VerifyEmailResetPass";
+import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
 
 const Stack = createStackNavigator();
 
@@ -65,6 +67,11 @@ export default function App() {
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
         <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen
+          name="VerifyEmailResetPass"
+          component={VerifyEmailResetPass}
+        />
+        <Stack.Screen name="SetNewPass" component={SetNewPass} />
         <Stack.Screen name="Home" component={ProtectedComponent} />
       </Stack.Navigator>
     </NavigationContainer>

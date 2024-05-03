@@ -56,6 +56,7 @@ export default function Login() {
 
       if (!response.ok) {
         const data = await response.json();
+        setError(data.message);
         throw new Error(data.message);
       }
 
@@ -148,7 +149,15 @@ export default function Login() {
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                Login
+              </Text>
             )}
           </TouchableOpacity>
 

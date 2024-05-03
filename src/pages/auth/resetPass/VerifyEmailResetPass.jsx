@@ -2,7 +2,6 @@ import React, { useState, createRef, useEffect } from "react";
 import {
   View,
   TextInput,
-  Button,
   Alert,
   StyleSheet,
   Image,
@@ -17,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { API_URL } from "../../../api/config";
 import axios from "axios";
 
-export default function VerifyEmail({ route }) {
+export default function VerifyEmailResetPass({ route }) {
   const { email } = route.params;
   const [errors, setErrors] = useState({ otp: "" });
   const [loading, setLoading] = useState(false);
@@ -61,12 +60,15 @@ export default function VerifyEmail({ route }) {
     setLoading(true);
 
     try {
-      const otpResponse = await axios.post(`${API_URL}/auth/verify-otp`, {
-        email,
-        otp: enteredOtp,
-      });
+      const otpResponse = await axios.post(
+        `${API_URL}/auth/verify-pass-reset-otp`,
+        {
+          email,
+          otp: enteredOtp,
+        }
+      );
       Alert.alert("Success", otpResponse.data.message);
-      navigation.navigate("Login");
+      navigation.navigate("SetNewPass", { email });
     } catch (error) {
       setErrors({ otp: error.response.data.message });
     } finally {
@@ -77,9 +79,12 @@ export default function VerifyEmail({ route }) {
   const handleResendOtp = async () => {
     setLoadingResent(true);
     try {
-      const otpResponse = await axios.post(`${API_URL}/auth/email-otp`, {
-        email,
-      });
+      const otpResponse = await axios.post(
+        `${API_URL}/auth/pass-reset-req-otp`,
+        {
+          email,
+        }
+      );
       Alert.alert("Success", otpResponse.data.message);
     } catch (error) {
       Alert.alert("Error", error.response.data.message);
@@ -154,7 +159,15 @@ export default function VerifyEmail({ route }) {
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={{ color: "#fff", textAlign: "center" }}>Submit</Text>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                Submit
+              </Text>
             )}
           </TouchableOpacity>
 

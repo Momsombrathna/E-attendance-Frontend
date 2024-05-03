@@ -15,37 +15,51 @@ import { useNavigation } from "@react-navigation/native";
 import { API_URL } from "../../../api/config";
 import axios from "axios";
 import Logo from "../../../../assets/e-attendance.png";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-export default function ForgotPass() {
-  const [email, setEmail] = useState("");
+export default function SetNewPass({ route }) {
+  const { email } = route.params;
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigation = useNavigation();
 
-  const handleOtpRequest = async () => {
+  const handleSetNewPass = async () => {
     setLoading(true);
     setError("");
 
-    if (!email) {
-      setError("Email is required");
+    if (!password || !confirmPassword) {
+      setError("All fields are required");
       setLoading(false);
       return;
     }
 
-    if (!email || !email.includes("@") || !email.includes(".")) {
-      setError("Invalid email address");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/pass-reset-req-otp`, {
+      const response = await axios.post(`${API_URL}/auth/set-new-password`, {
         email,
+        password,
       });
 
       if (response.status === 200) {
         setLoading(false);
-        navigation.navigate("VerifyEmailResetPass", { email });
+        Alert.alert("Password reset successfully. Please login.");
+        navigation.navigate("Login");
       } else {
         setLoading(false);
         setError("An error occurred. Please try again.");
@@ -70,24 +84,57 @@ export default function ForgotPass() {
           <Image source={Logo} style={{ width: 110, height: 100 }} />
         </View>
         <View style={styles.headerContainer}>
-          <Text style={styles.header}>Request a password </Text>
-          <Text style={styles.header}>reset OTP code</Text>
+          <Text style={styles.header}>Set new password </Text>
         </View>
         <View style={styles.viewsContainer}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Password</Text>
           <View style={[styles.inputContainer, error && styles.inputError]}>
             <TextInput
-              style={styles.inputUsername}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email"
+              secureTextEntry={!isPasswordVisible}
+              style={styles.inputPassword}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
             />
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              <Icon
+                name={isPasswordVisible ? "eye-slash" : "eye"}
+                size={20}
+                color="grey"
+              />
+            </TouchableOpacity>
+          </View>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+        </View>
+        <View style={styles.viewsContainer}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={[styles.inputContainer, error && styles.inputError]}>
+            <TextInput
+              secureTextEntry={!isConfirmPasswordVisible}
+              style={styles.inputPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Confirm Password"
+            />
+            <TouchableOpacity
+              onPress={() =>
+                setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+              }
+            >
+              <Icon
+                name={isConfirmPasswordVisible ? "eye-slash" : "eye"}
+                size={20}
+                color="grey"
+              />
+            </TouchableOpacity>
           </View>
           {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
         <TouchableOpacity
           style={styles.button}
-          onPress={handleOtpRequest}
+          onPress={handleSetNewPass}
           disabled={loading}
         >
           {loading ? (
@@ -129,7 +176,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewsContainer: {
-    marginBottom: 20,
     marginTop: 20,
     position: "relative",
   },
@@ -174,7 +220,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     opacity: 0.9,
     borderRadius: 10,
-    marginTop: 5,
+    marginTop: 25,
   },
   buttonText: {
     color: "#fff",
