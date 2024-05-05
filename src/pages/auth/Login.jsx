@@ -7,12 +7,14 @@ import {
   StyleSheet,
   Image,
   Text,
+  Platform,
   TouchableOpacity,
+  ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import Logo from "../../../assets/e-attendance.png";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
 import { API_URL } from "../../api/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -54,6 +56,7 @@ export default function Login() {
 
       if (!response.ok) {
         const data = await response.json();
+        setError(data.message);
         throw new Error(data.message);
       }
 
@@ -72,8 +75,10 @@ export default function Login() {
       };
 
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
-      console.log(userData);
-      navigation.replace("Protected");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
     } catch (error) {
       setError(error.message);
     } finally {
@@ -83,12 +88,16 @@ export default function Login() {
 
   return (
     <>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <View style={styles.main}>
           <View style={styles.logo}>
             <Image source={Logo} style={{ width: 110, height: 100 }} />
           </View>
-          <Text style={styles.header}>Welcome Back.</Text>
+
+          <Text style={styles.header}>Welcome Back</Text>
           <View style={styles.viewsContainer}>
             <Text style={styles.label}>Email</Text>
             <View style={[styles.inputContainer, error && styles.inputError]}>
@@ -126,7 +135,7 @@ export default function Login() {
           </View>
           <Text
             onPress={() => {
-              navigation.navigate("ForgotPassword");
+              navigation.navigate("ForgotPass");
             }}
             style={styles.text_forgot}
           >
@@ -140,7 +149,15 @@ export default function Login() {
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={{ color: "#fff", textAlign: "center" }}>Login</Text>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                Login
+              </Text>
             )}
           </TouchableOpacity>
 
@@ -166,7 +183,7 @@ export default function Login() {
             </Text>
           </Text>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </>
   );
 }
@@ -181,8 +198,9 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     marginBottom: 16,
+    fontWeight: "bold",
     color: "#2F3791",
-    opacity: 0.8,
+    opacity: 0.9,
   },
 
   main: {
@@ -199,7 +217,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderColor: "gray",
+    borderColor: "#2F3791",
     borderWidth: 1,
     marginBottom: 16,
     padding: 10,
@@ -272,5 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingLeft: 5,
     marginBottom: 5,
+    opacity: 0.9,
   },
 });
