@@ -4,8 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
 import { createStackNavigator } from "@react-navigation/stack";
-import { View, StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import Classes from "./src/pages/Classes";
 import Settings from "./src/pages/Settings";
