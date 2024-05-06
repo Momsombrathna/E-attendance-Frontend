@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
 import { createStackNavigator } from "@react-navigation/stack";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import Classes from "./src/pages/Classes";
 import Settings from "./src/pages/Settings";
 import Profile from "./src/pages/Profile";
 import Login from "./src/pages/auth/Login";
 import Register from "./src/pages/auth/Register";
+import VerifyEmail from "./src/pages/auth/verifyOtp/VerifyEmail";
+import ForgotPass from "./src/pages/auth/resetPass/ForgotPass";
+import VerifyEmailResetPass from "./src/pages/auth/resetPass/VerifyEmailResetPass";
+import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
 
 const Stack = createStackNavigator();
 
@@ -59,7 +64,14 @@ export default function App() {
       >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Protected" component={ProtectedComponent} />
+        <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
+        <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen
+          name="VerifyEmailResetPass"
+          component={VerifyEmailResetPass}
+        />
+        <Stack.Screen name="SetNewPass" component={SetNewPass} />
+        <Stack.Screen name="Home" component={ProtectedComponent} />
       </Stack.Navigator>
     </NavigationContainer>
   );
