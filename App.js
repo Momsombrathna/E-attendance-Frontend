@@ -17,6 +17,7 @@ import VerifyEmailResetPass from "./src/pages/auth/resetPass/VerifyEmailResetPas
 import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
 import SubClass from "./src/pages/SubClasses";
 import CameraSelfie from "./src/pages/cameraSelfie";
+import GenerateCard from "./src/pages/user/GenerateCard";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -54,6 +55,7 @@ function TabNavigator() {
 }
 
 const ProtectedComponent = withAuthProtection(TabNavigator);
+const GenerateCardComponent = withAuthProtection(GenerateCard);
 
 export default function App() {
   return (
@@ -68,6 +70,7 @@ export default function App() {
           component={ProtectedComponent}
           options={{ title: " Back" }}
         />
+        <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="VerifyEmail" component={VerifyEmail} />

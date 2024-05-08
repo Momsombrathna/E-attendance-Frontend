@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 import {
@@ -14,14 +14,16 @@ import {
   TextInput,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import LoadingScreen from "./LoadingScreen";
 import * as ImagePicker from "expo-image-picker";
 
 export default function Profile() {
   const navigation = useNavigation();
-  const { userId, token, username, email, role } = useUserData();
-  const [file, setFile] = useState(null);
-  const [error, setError] = useState(null);
+  const { userId, token } = useUserData();
+  const [user, setUser] = useState({});
+  const [card, setCard] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -43,7 +45,57 @@ export default function Profile() {
     }
   };
 
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    getUserData();
+  }, [userId]);
+
+  useEffect(() => {
+    getCardData();
+  }, [userId]);
+
+  const getUserData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/user/get/${userId}`, {
+        method: "GET",
+        headers: {
+          "auth-token": token,
+        },
+      });
+      const data = await response.json();
+      setUser(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCardData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/user/get-student-card/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const data = await response.json();
+      setCard(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       {
@@ -70,124 +122,31 @@ export default function Profile() {
       },
     ]);
   };
+
   return (
     <>
       {loading ? (
         <LoadingScreen />
       ) : (
         <View style={styles.container}>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignItems: "center",
-              marginVertical: 16,
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <Image
-                source={require("../../assets/e-attendance.png")}
-                style={{
-                  objectFit: "contain",
-                  width: 70,
-                  height: 70,
-                  marginStart: 30,
-                  borderColor: "black",
-                  borderWidth: 1,
-                  borderRadius: 50,
-                }}
-              />
-            </View>
-            <TouchableOpacity
-              onPress={() => ToastAndroid.show("Clicked", ToastAndroid.SHORT)}
-              style={{
-                marginEnd: 30,
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 10,
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.23,
-                shadowRadius: 2.62,
-                elevation: 4,
-              }}
-            >
-              <Text>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.text}>Profile:</Text>
+          <Image style={styles.image} source={{ uri: user.profile }} />
+          <Text style={styles.text}>Welcome {user.username} </Text>
+          <Text style={styles.text}>Email: {user.email} </Text>
 
-          <View style={{ marginHorizontal: 15 }}>
-            <Text style={{ marginStart: 3, marginVertical: 5 }}>Username</Text>
-            <TextInput
-              style={{
-                borderColor: "gray",
-                width: "100%",
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 8,
-                fontSize: 16,
-              }}
-            >
-              {username}
-            </TextInput>
-            <Text style={{ marginStart: 3, marginVertical: 5 }}>Email</Text>
-            <TextInput
-              style={{
-                borderColor: "gray",
-                width: "100%",
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 8,
-                fontSize: 16,
-              }}
-            >
-              {email}
-            </TextInput>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{ marginStart: 3, marginVertical: 5 }}>Role</Text>
-                <TextInput
-                  style={{
-                    borderColor: "gray",
-                    width: "100%",
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    padding: 8,
-                    fontSize: 16,
-                  }}
-                >
-                  Student
-                </TextInput>
-              </View>
-              <View style={{ flex: 0.1 }}></View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ marginStart: 3, marginVertical: 5 }}>
-                  Gender
-                </Text>
-                <TextInput
-                  style={{
-                    borderColor: "gray",
-                    width: "100%",
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    padding: 8,
-                    fontSize: 16,
-                  }}
-                >
-                  Male
-                </TextInput>
-              </View>
-            </View>
-          </View>
+          <Text style={styles.text}>Card:</Text>
+          <Text style={styles.text}>firstName: {card.firstName}</Text>
+          <Text style={styles.text}>lastName: {card.lastName}</Text>
+          <Text style={styles.text}>Phone number: {card.phoneNumber}</Text>
+          <Text style={styles.text}>Address: {card.address}</Text>
+          <Image style={styles.image} source={{ uri: card.profile }} />
+          <Image style={styles.qrCode} source={{ uri: card.qrCode }} />
+
+          <Button title="Logout" onPress={handleLogout} />
+          <Button
+            title="GenerateCard"
+            onPress={() => navigation.navigate("GenerateCard")}
+          />
         </View>
       )}
     </>
@@ -202,5 +161,20 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     marginBottom: 16,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 8,
+  },
+  qrCode: {
+    width: 100,
+    height: 100,
+    marginBottom: 8,
   },
 });
