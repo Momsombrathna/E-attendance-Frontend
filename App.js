@@ -15,10 +15,11 @@ import VerifyEmail from "./src/pages/auth/verifyOtp/VerifyEmail";
 import ForgotPass from "./src/pages/auth/resetPass/ForgotPass";
 import VerifyEmailResetPass from "./src/pages/auth/resetPass/VerifyEmailResetPass";
 import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
+import SubClass from "./src/pages/SubClasses";
+import CameraSelfie from "./src/pages/cameraSelfie";
 import GenerateCard from "./src/pages/user/GenerateCard";
 
 const Stack = createStackNavigator();
-
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
@@ -64,7 +65,11 @@ export default function App() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Home" component={ProtectedComponent} />
+        <Stack.Screen
+          name="Home"
+          component={ProtectedComponent}
+          options={{ title: " Back" }}
+        />
         <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
@@ -75,6 +80,17 @@ export default function App() {
           component={VerifyEmailResetPass}
         />
         <Stack.Screen name="SetNewPass" component={SetNewPass} />
+        <Stack.Screen name="Classes" component={Classes} />
+        <Stack.Screen
+          name="SubClass"
+          component={SubClass}
+          options={{ headerShown: true, title: "Class name" }}
+        />
+        <Stack.Screen
+          name="cameraSelfie"
+          component={CameraSelfie}
+          options={{ headerShown: true, title: "Take a selfie" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
