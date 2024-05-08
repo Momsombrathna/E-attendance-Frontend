@@ -16,7 +16,6 @@ import Logo from "../../../assets/e-attendance.png";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL } from "../../api/config";
-import axios from "axios";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -27,6 +26,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
@@ -56,6 +56,64 @@ export default function Register() {
       return;
     }
 
+    if (/\s/.test(email)) {
+      setEmailError("Email should not contain spaces");
+      setLoading(false);
+      return;
+    }
+
+    if (/\s/.test(password)) {
+      setPasswordError("Password should not contain spaces");
+      setLoading(false);
+      return;
+    }
+
+    if (!username) {
+      setUsernameError("Username is required");
+      setLoading(false);
+      return;
+    }
+
+    if (username.length > 30) {
+      setUsernameError("Username must be 30 characters or fewer");
+      setLoading(false);
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9._]+$/.test(username)) {
+      setUsernameError(
+        "Username can only contain letters, numbers, periods, and underscores"
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setPasswordError("Password must contain at least one uppercase letter");
+      setLoading(false);
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setPasswordError("Password must contain at least one lowercase letter");
+      setLoading(false);
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setPasswordError("Password must contain at least one digit");
+      setLoading(false);
+      return;
+    }
+
+    if (!/[!@#$%^&*]/.test(password)) {
+      setPasswordError(
+        "Password must contain at least one special character (!@#$%^&*)"
+      );
+      setLoading(false);
+      return;
+    }
+
     if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters");
       setLoading(false);
@@ -63,35 +121,53 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        username,
-        email,
-        password,
+      // Register the user
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+        }),
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(result.message);
-        throw new Error(result.message);
+        setError(data.message);
+        setLoading(false);
+        return;
       }
 
-      // Call the OTP API after successful registration
-      const otpResponse = await axios.post(`${API_URL}/auth/email-otp`, {
-        email,
+      // Send the OTP
+      const otpResponse = await fetch(`${API_URL}/auth/email-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
       });
 
+      const otpData = await otpResponse.json();
+
       if (!otpResponse.ok) {
-        setError(otpResponse.message);
-        throw new Error(otpResponse.message);
+        setError(otpData.message);
+        setLoading(false);
+        return;
       }
 
+      // Navigate to the verification page
       navigation.navigate("VerifyEmail", { email });
     } catch (error) {
       setError(error.message);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
   return (
     <KeyboardAvoidingView
@@ -112,19 +188,21 @@ export default function Register() {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Username</Text>
         <TextInput
-          style={[styles.input, error && styles.inputError]}
+          style={[styles.input, (usernameError || error) && styles.inputError]}
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
         />
 
-        {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
+        {usernameError ? (
+          <Text style={styles.errorMessage}>{error}</Text>
+        ) : null}
       </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          style={[styles.input, emailError && styles.inputError]}
+          style={[styles.input, (emailError || error) && styles.inputError]}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -139,7 +217,10 @@ export default function Register() {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Password</Text>
         <View
-          style={[styles.passwordContainer, passwordError && styles.inputError]}
+          style={[
+            styles.passwordContainer,
+            (passwordError || error) && styles.inputError,
+          ]}
         >
           <TextInput
             style={styles.passwordInput}
@@ -169,7 +250,10 @@ export default function Register() {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Confirm Password</Text>
         <View
-          style={[styles.passwordContainer, passwordError && styles.inputError]}
+          style={[
+            styles.passwordContainer,
+            (passwordError || error) && styles.inputError,
+          ]}
         >
           <TextInput
             style={styles.passwordInput}

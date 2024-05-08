@@ -1,14 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
-import { Text, Alert, TextStyle, View, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Text,
+  Alert,
+  TextStyle,
+  View,
+  Button,
+  StyleSheet,
+  Image,
+} from "react-native";
 import LoadingScreen from "./LoadingScreen";
 
 export default function Profile() {
   const navigation = useNavigation();
   const { userId, token } = useUserData();
+  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getUserData();
+  }, [userId]);
+
+  const getUserData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/user/get/${userId}`, {
+        method: "GET",
+        headers: {
+          "auth-token": token,
+        },
+      });
+      const data = await response.json();
+      setUser(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       {
@@ -35,15 +69,23 @@ export default function Profile() {
       },
     ]);
   };
+
   return (
     <>
       {loading ? (
         <LoadingScreen />
       ) : (
         <View style={styles.container}>
-          <Text style={styles.header}>Profile</Text>
-          <Text style={styles.text}>User ID: {userId}</Text>
+          <Text style={styles.text}>Profile:</Text>
+          <Image style={styles.image} source={{ uri: user.profile }} />
+          <Text style={styles.text}>Welcome {user.username} </Text>
+          <Text style={styles.text}>Email: {user.email} </Text>
+
           <Button title="Logout" onPress={handleLogout} />
+          <Button
+            title="GenerateCard"
+            onPress={() => navigation.navigate("GenerateCard")}
+          />
         </View>
       )}
     </>
@@ -60,5 +102,15 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     marginBottom: 16,
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 8,
   },
 });
