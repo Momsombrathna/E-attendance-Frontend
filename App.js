@@ -5,6 +5,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { TouchableOpacity, Button, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import Classes from "./src/pages/Classes";
 import Settings from "./src/pages/Settings";
@@ -18,11 +20,14 @@ import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
 import SubClass from "./src/pages/SubClasses";
 import CameraSelfie from "./src/pages/cameraSelfie";
 import GenerateCard from "./src/pages/user/GenerateCard";
+import CreateClass from "./src/pages/user/CreateClass";
+import UpdateClass from "./src/pages/user/UpdateClass";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
+  const navigation = useNavigation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -47,7 +52,36 @@ function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Classes" component={Classes} />
+      <Tab.Screen
+        name="Classes"
+        component={Classes}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{
+                marginRight: 20,
+                backgroundColor: "#eee",
+                padding: 5,
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => navigation.navigate("CreateClass")}
+            >
+              <FontAwesome5
+                name="plus"
+                size={20}
+                style={{
+                  color: "#2F3791",
+                  opacity: 0.9,
+                }}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
@@ -56,6 +90,8 @@ function TabNavigator() {
 
 const ProtectedComponent = withAuthProtection(TabNavigator);
 const GenerateCardComponent = withAuthProtection(GenerateCard);
+const CreateClassComponent = withAuthProtection(CreateClass);
+const UpdateClassComponent = withAuthProtection(UpdateClass);
 
 export default function App() {
   return (
@@ -71,6 +107,33 @@ export default function App() {
           options={{ title: " Back" }}
         />
         <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
+        <Stack.Screen name="CreateClass" component={CreateClassComponent} />
+        <Stack.Screen
+          name="UpdateClass"
+          component={UpdateClassComponent}
+          options={{
+            headerShown: true,
+            title: "Update Class",
+            headerRight: () => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginRight: 10,
+                }}
+              >
+                <Button
+                  onPress={() => {
+                    route.params?.handleUpdateClass?.();
+                  }}
+                  title="Done"
+                  color="blue"
+                />
+              </View>
+            ),
+          }}
+        />
+
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
