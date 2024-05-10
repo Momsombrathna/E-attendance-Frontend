@@ -172,7 +172,7 @@ export default function Login() {
             Don't have an account? &nbsp;
             <Text
               onPress={() => {
-                navigation.navigate("Home");
+                navigation.navigate("Register");
               }}
               style={{
                 color: "#2F3791",

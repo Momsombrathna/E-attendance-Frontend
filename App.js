@@ -23,9 +23,12 @@ import CameraSelfie from "./src/pages/cameraSelfie";
 import GenerateCard from "./src/pages/user/GenerateCard";
 import CreateClass from "./src/pages/user/CreateClass";
 import UpdateClass from "./src/pages/user/UpdateClass";
+import CreateSubClasses from "./src/pages/user/CreateSubClasses";
+import ViewSubClasses from "./src/pages/user/ViewSubClasses";
 import JoinClass from "./src/pages/user/JoinClass";
 import MyClasses from "./src/pages/MyClasses";
 import ViewMember from "./src/pages/user/ViewMember";
+import MySubClasses from "./src/pages/user/MySubClass";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,6 +65,7 @@ function TabNavigator() {
         name="MyClasses"
         component={MyClasses}
         options={{
+          title: "My Classes",
           headerRight: () => (
             <TouchableOpacity
               style={{
@@ -115,10 +119,43 @@ function TabNavigator() {
   );
 }
 
+const HeaderRight = ({ classId, token }) => {
+  const navigation = useNavigation();
+
+  return (
+    <TouchableOpacity
+      style={{
+        marginRight: 20,
+        backgroundColor: "#eee",
+        padding: 5,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onPress={() =>
+        navigation.navigate("CreateSubClasses", { classId, token })
+      }
+    >
+      <FontAwesome5
+        name="plus"
+        size={20}
+        style={{
+          color: "#2F3791",
+          opacity: 0.9,
+        }}
+      />
+    </TouchableOpacity>
+  );
+};
+
 const ProtectedComponent = withAuthProtection(TabNavigator);
 const GenerateCardComponent = withAuthProtection(GenerateCard);
 const CreateClassComponent = withAuthProtection(CreateClass);
 const UpdateClassComponent = withAuthProtection(UpdateClass);
+const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
+const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
 
 export default function App() {
   return (
@@ -132,6 +169,74 @@ export default function App() {
           name="Home"
           component={ProtectedComponent}
           options={{ title: " Back" }}
+        />
+
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
+        <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen
+          name="VerifyEmailResetPass"
+          component={VerifyEmailResetPass}
+        />
+        <Stack.Screen name="SetNewPass" component={SetNewPass} />
+        <Stack.Screen name="Classes" component={Classes} />
+
+        <Stack.Screen
+          name="My SubClass"
+          component={MySubClasses}
+          options={({ route, navigation }) => ({
+            headerShown: true,
+            title: route.params.className,
+            headerRight: () => (
+              <HeaderRight
+                classId={route.params.classId}
+                token={route.params.token}
+              />
+            ),
+            headerTitle: () => {
+              return (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("viewMembers")}
+                >
+                  <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    {route.params.className}
+                  </Text>
+                </TouchableOpacity>
+              );
+            },
+            title: "Back",
+          })}
+        />
+        <Stack.Screen
+          name="SubClass"
+          component={SubClasses}
+          options={({ route, navigation }) => ({
+            headerShown: true,
+            title: route.params.className,
+            headerTitle: () => {
+              return (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("viewMembers")}
+                >
+                  <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    {route.params.className}
+                  </Text>
+                </TouchableOpacity>
+              );
+            },
+            title: "Back",
+          })}
+        />
+        <Stack.Screen
+          name="viewMembers"
+          component={ViewMember}
+          options={{ headerShown: true, title: "Members" }}
+        />
+        <Stack.Screen
+          name="cameraSelfie"
+          component={CameraSelfie}
+          options={{ headerShown: true, title: "Take a selfie" }}
         />
         <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
         <Stack.Screen
@@ -158,44 +263,22 @@ export default function App() {
             title: "Update Class",
           }}
         />
-
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
-        <Stack.Screen name="ForgotPass" component={ForgotPass} />
         <Stack.Screen
-          name="VerifyEmailResetPass"
-          component={VerifyEmailResetPass}
-        />
-        <Stack.Screen name="SetNewPass" component={SetNewPass} />
-        <Stack.Screen name="Classes" component={Classes} />
-        <Stack.Screen
-          name="SubClass"
-          component={SubClasses}
-          options={({ route, navigation }) => ({
+          name="CreateSubClasses"
+          component={CreateSubClassesComponent}
+          options={{
             headerShown: true,
-            headerTitle: () => {
-              return (
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("viewMembers")}
-                >
-                  <Text style={{ fontWeight: "600", fontSize: 20 }}>
-                    {route.params.className}
-                  </Text>
-                </TouchableOpacity>
-              );
-            },
-          })}
+            title: "Create Subclass",
+          }}
+          headerRight={() => <HeaderRight />}
         />
         <Stack.Screen
-          name="viewMembers"
-          component={ViewMember}
-          options={{ headerShown: true, title: "Members" }}
-        />
-        <Stack.Screen
-          name="cameraSelfie"
-          component={CameraSelfie}
-          options={{ headerShown: true, title: "Take a selfie" }}
+          name="ViewSubClasses"
+          component={ViewSubClassesComponent}
+          options={{
+            headerShown: true,
+            title: "View Subclass",
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
