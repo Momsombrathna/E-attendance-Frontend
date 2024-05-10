@@ -22,6 +22,8 @@ import CameraSelfie from "./src/pages/cameraSelfie";
 import GenerateCard from "./src/pages/user/GenerateCard";
 import CreateClass from "./src/pages/user/CreateClass";
 import UpdateClass from "./src/pages/user/UpdateClass";
+import CreateSubClasses from "./src/pages/user/CreateSubClasses";
+import ViewSubClasses from "./src/pages/user/ViewSubClasses";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,10 +90,43 @@ function TabNavigator() {
   );
 }
 
+const HeaderRight = ({ classId, token }) => {
+  const navigation = useNavigation();
+
+  return (
+    <TouchableOpacity
+      style={{
+        marginRight: 20,
+        backgroundColor: "#eee",
+        padding: 5,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onPress={() =>
+        navigation.navigate("CreateSubClasses", { classId, token })
+      }
+    >
+      <FontAwesome5
+        name="plus"
+        size={20}
+        style={{
+          color: "#2F3791",
+          opacity: 0.9,
+        }}
+      />
+    </TouchableOpacity>
+  );
+};
+
 const ProtectedComponent = withAuthProtection(TabNavigator);
 const GenerateCardComponent = withAuthProtection(GenerateCard);
 const CreateClassComponent = withAuthProtection(CreateClass);
 const UpdateClassComponent = withAuthProtection(UpdateClass);
+const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
+const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
 
 export default function App() {
   return (
@@ -105,23 +140,6 @@ export default function App() {
           name="Home"
           component={ProtectedComponent}
           options={{ title: " Back" }}
-        />
-        <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
-        <Stack.Screen
-          name="CreateClass"
-          component={CreateClassComponent}
-          options={{
-            title: " Create Class",
-            headerShown: true,
-          }}
-        />
-        <Stack.Screen
-          name="UpdateClass"
-          component={UpdateClassComponent}
-          options={{
-            headerShown: true,
-            title: "Update Class",
-          }}
         />
 
         <Stack.Screen name="Login" component={Login} />
@@ -140,12 +158,52 @@ export default function App() {
           options={({ route }) => ({
             headerShown: true,
             title: route.params.className,
+            headerRight: () => (
+              <HeaderRight
+                classId={route.params.classId}
+                token={route.params.token}
+              />
+            ),
           })}
         />
         <Stack.Screen
           name="cameraSelfie"
           component={CameraSelfie}
           options={{ headerShown: true, title: "Take a selfie" }}
+        />
+        <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
+        <Stack.Screen
+          name="CreateClass"
+          component={CreateClassComponent}
+          options={{
+            title: " Create Class",
+            headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="UpdateClass"
+          component={UpdateClassComponent}
+          options={{
+            headerShown: true,
+            title: "Update Class",
+          }}
+        />
+        <Stack.Screen
+          name="CreateSubClasses"
+          component={CreateSubClassesComponent}
+          options={{
+            headerShown: true,
+            title: "Create Subclass",
+          }}
+          headerRight={() => <HeaderRight />}
+        />
+        <Stack.Screen
+          name="ViewSubClasses"
+          component={ViewSubClassesComponent}
+          options={{
+            headerShown: true,
+            title: "View Subclass",
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

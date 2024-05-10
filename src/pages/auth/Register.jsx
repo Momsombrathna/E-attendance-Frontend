@@ -80,14 +80,6 @@ export default function Register() {
       return;
     }
 
-    if (!/^[a-zA-Z0-9._]+$/.test(username)) {
-      setUsernameError(
-        "Username can only contain letters, numbers, periods, and underscores"
-      );
-      setLoading(false);
-      return;
-    }
-
     if (!/[A-Z]/.test(password)) {
       setPasswordError("Password must contain at least one uppercase letter");
       setLoading(false);
@@ -195,7 +187,7 @@ export default function Register() {
         />
 
         {usernameError ? (
-          <Text style={styles.errorMessage}>{error}</Text>
+          <Text style={styles.errorUsernameMessage}>{usernameError}</Text>
         ) : null}
       </View>
 
@@ -421,5 +413,14 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     position: "relative",
+  },
+  errorUsernameMessage: {
+    color: "red",
+    fontSize: 11,
+    width: "90%",
+    textAlign: "left",
+    paddingLeft: 5,
+    position: "absolute",
+    bottom: -6,
   },
 });

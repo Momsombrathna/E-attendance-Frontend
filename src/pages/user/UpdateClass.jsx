@@ -32,7 +32,7 @@ export default function UpdateClass({ route }) {
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.05,
+        quality: 0.3,
       });
 
       if (result.cancelled) {
@@ -45,7 +45,7 @@ export default function UpdateClass({ route }) {
         const manipResult = await ImageManipulator.manipulateAsync(
           result.assets[0].uri,
           [{ resize: { width: 400 } }],
-          { compress: 0.3, format: ImageManipulator.SaveFormat.JPEG }
+          { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
         );
 
         setClassImage(manipResult.uri);

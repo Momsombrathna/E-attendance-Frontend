@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function SubClasses({ route }) {
   const { classId, token } = route.params;
@@ -51,9 +52,15 @@ export default function SubClasses({ route }) {
     }
   };
 
-  useEffect(() => {
-    getSubClass();
-  }, [classId]);
+  // useEffect(() => {
+  //   getSubClass();
+  // }, [classId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getSubClass();
+    }, [classId])
+  );
 
   // console.log(token);
   // console.log(subClass);
@@ -77,7 +84,11 @@ export default function SubClasses({ route }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.subClass}
-              onPress={() => Alert.alert("Subclass")}
+              onPress={() =>
+                navigation.navigate("ViewSubClasses", {
+                  subClassId: item._id,
+                })
+              }
             >
               <View style={styles.body}>
                 <View>
@@ -100,7 +111,7 @@ export default function SubClasses({ route }) {
                     setModalVisible(true);
                   }}
                 >
-                  <Feather name="map-pin" size={30} color="#2F3791" />
+                  <Feather name="map-pin" size={30} color="#666" />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
