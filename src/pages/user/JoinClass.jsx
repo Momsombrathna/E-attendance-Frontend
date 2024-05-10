@@ -12,10 +12,54 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
-export default function JoinClass(route) {
+export default function JoinClass() {
+  const { userId, token } = useUserData();
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+
+  const joinClass = async () => {
+    setLoading(true);
+    setError("");
+
+    if (!code) {
+      setError("Please enter a valid code");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/class/invite-by-code/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+          body: JSON.stringify({
+            code,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.message);
+        throw new Error(data.message);
+      } else {
+        navigation.goBack();
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again later");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -24,19 +68,21 @@ export default function JoinClass(route) {
     >
       <ScrollView>
         <View style={styles.container}>
-          <View style={styles.form}>
+          <View style={[styles.inputContainer, error && styles.inputError]}>
             <TextInput
+              type="text"
               style={styles.input}
-              value={""}
+              value={code}
+              onChangeText={(text) => setCode(text)}
               placeholder="Enter Invite Code"
             />
-            {/* {error && <Text style={styles.error}>{error}</Text>} */}
-            <TouchableOpacity style={styles.button} onPress={{}}>
-              <Text style={styles.buttonText}>
-                {loading ? <ActivityIndicator color="white" /> : "Join"}
-              </Text>
-            </TouchableOpacity>
           </View>
+          {error && <Text style={styles.error}>{error}</Text>}
+          <TouchableOpacity style={styles.button} onPress={joinClass}>
+            <Text style={styles.buttonText}>
+              {loading ? <ActivityIndicator color="white" /> : "Join"}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -45,48 +91,39 @@ export default function JoinClass(route) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
     flex: 1,
-    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  form: {
-    flex: 1,
-    height: 100,
-  },
-  text: {
-    fontSize: 16,
+  inputContainer: {
+    width: "100%",
     marginBottom: 10,
+    backgroundColor: "#eee",
+    borderRadius: 5,
   },
   input: {
-    backgroundColor: "#eee",
-    height: 50,
+    fontSize: 16,
     padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
+    height: 50,
+  },
+  inputError: {
+    borderColor: "red",
   },
   button: {
-    backgroundColor: "#2F3791",
+    width: "100%",
     padding: 15,
-    alignItems: "center",
+    backgroundColor: "#2F3791",
     borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     color: "white",
-    fontWeight: "bold",
+    fontSize: 16,
   },
   error: {
     color: "red",
-    fontSize: 16,
+    marginBottom: 10,
   },
 });

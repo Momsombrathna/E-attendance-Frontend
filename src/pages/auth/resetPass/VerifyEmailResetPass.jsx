@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
   },
   logo: {
     width: 110,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 10,
   },
@@ -256,12 +256,10 @@ const styles = StyleSheet.create({
   input: {
     width: 50,
     height: 50,
-    borderColor: "#2F3791",
-    borderWidth: 1,
     borderRadius: 10,
     textAlign: "center",
     fontSize: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#eee",
     margin: 5,
   },
   inputError: {

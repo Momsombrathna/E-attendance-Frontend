@@ -17,6 +17,7 @@ import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
 import { Swipeable } from "react-native-gesture-handler";
 import { renderRightAction } from "../partials/Swapeable";
+import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 
 export default function MySubClasses({ route }) {
@@ -54,12 +55,11 @@ export default function MySubClasses({ route }) {
     }
   };
 
-  useEffect(() => {
-    getSubClass();
-  }, [classId]);
-
-  //   // console.log(token);
-  //   console.log(subClass.attendance);
+  useFocusEffect(
+    React.useCallback(() => {
+      getSubClass();
+    }, [classId])
+  );
 
   const renderRightActions = (
     progress,
@@ -85,7 +85,7 @@ export default function MySubClasses({ route }) {
           });
         },
         "edit",
-        90
+        100
       )}
       {renderRightAction(
         "Delete",
@@ -106,7 +106,7 @@ export default function MySubClasses({ route }) {
           ]);
         },
         "trash",
-        90
+        100
       )}
     </View>
   );
@@ -175,15 +175,56 @@ export default function MySubClasses({ route }) {
               >
                 <View style={styles.body}>
                   <View>
-                    <Text style={styles.subClassName}>{item.description}</Text>
+                    <View style={styles.name}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={styles.subClassName}
+                      >
+                        {item.description}
+                      </Text>
+                    </View>
                     <Text style={styles.time}>
-                      {new Date(item.from).toLocaleTimeString()} -{" "}
-                      {new Date(item.to).toLocaleTimeString()}
+                      {new Intl.DateTimeFormat("default", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(item.from))}{" "}
+                      -{" "}
+                      {new Intl.DateTimeFormat("default", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(new Date(item.to))}
                     </Text>
                     <Text style={styles.locationRange}>
-                      Location Range: {item.location_range}
+                      Range: {item.location_range}
+                    </Text>
+                    <Text style={styles.dateRange}>
+                      {new Intl.DateTimeFormat("default", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }).format(new Date(item.created))}
                     </Text>
                   </View>
+                  <View style={styles.checkedInCountContainer}>
+                    <Text style={styles.checkedInCount}>
+                      {
+                        item.attendances.filter(
+                          (attendance) => attendance.checkedIn
+                        ).length
+                      }
+                    </Text>
+                  </View>
+                  <View style={styles.checkedOutCountContainer}>
+                    <Text style={styles.checkedOutCount}>
+                      {
+                        item.attendances.filter(
+                          (attendance) => attendance.checkedOut
+                        ).length
+                      }
+                    </Text>
+                  </View>
+
                   <TouchableOpacity
                     onPress={() => {
                       setCurrentLocation({
@@ -194,7 +235,7 @@ export default function MySubClasses({ route }) {
                       setModalVisible(true);
                     }}
                   >
-                    <Feather name="map-pin" size={30} color="#2F3791" />
+                    <Feather name="map-pin" size={30} color="#666" />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -246,17 +287,21 @@ export default function MySubClasses({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 5,
     backgroundColor: "#fff",
   },
   subClass: {
-    padding: 15,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     gap: 3,
   },
   subClassName: {
     fontSize: 18,
+  },
+  name: {
+    maxWidth: 150,
+    width: 150,
+    marginBottom: 5,
   },
   time: {
     fontSize: 14,
@@ -274,5 +319,36 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  date: {
+    fontSize: 14,
+
+    color: "#666",
+  },
+  checkedInCount: {
+    fontSize: 14,
+    padding: 5,
+    color: "#fff",
+  },
+  checkedOutCount: {
+    fontSize: 14,
+    color: "#fff",
+    padding: 5,
+  },
+  dateRange: {
+    fontSize: 14,
+    color: "#666",
+  },
+  checkedInCountContainer: {
+    backgroundColor: "green",
+    opacity: 0.8,
+    borderRadius: 5,
+    margin: 5,
+  },
+  checkedOutCountContainer: {
+    backgroundColor: "purple",
+    opacity: 0.8,
+    borderRadius: 5,
+    margin: 5,
   },
 });

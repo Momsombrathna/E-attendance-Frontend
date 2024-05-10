@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import { useFocusEffect } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 
 const Classes = () => {
@@ -17,10 +17,6 @@ const Classes = () => {
   const [loading, setLoading] = useState(true);
   const [classData, setClass] = useState({});
   const { token, userId } = useUserData();
-
-  useEffect(() => {
-    getClassData();
-  }, [userId]);
 
   const getClassData = async () => {
     setLoading(true);
@@ -44,6 +40,12 @@ const Classes = () => {
       setLoading(false);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getClassData();
+    }, [userId])
+  );
 
   return (
     <View style={styles.main}>

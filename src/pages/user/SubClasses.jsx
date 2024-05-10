@@ -65,9 +65,6 @@ export default function SubClasses({ route }) {
     }, [classId])
   );
 
-  // console.log(token);
-  console.log(subClass.attendance);
-
   return (
     <View style={styles.container}>
       {loading ? (
@@ -91,6 +88,7 @@ export default function SubClasses({ route }) {
                 onPress={() =>
                   navigation.navigate("ViewSubClasses", {
                     subClassId: item._id,
+                    className: item.description,
                   })
                 }
               >

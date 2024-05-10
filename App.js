@@ -100,8 +100,9 @@ function TabNavigator() {
               style={{
                 marginRight: 20,
                 backgroundColor: "#eee",
-                padding: 10,
-                borderRadius: 15,
+                padding: 5,
+                paddingHorizontal: 10,
+                borderRadius: 10,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -183,7 +184,7 @@ export default function App() {
         <Stack.Screen name="Classes" component={Classes} />
 
         <Stack.Screen
-          name="My SubClass"
+          name="MySubClass"
           component={MySubClasses}
           options={({ route, navigation }) => ({
             headerShown: true,

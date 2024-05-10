@@ -152,14 +152,21 @@ const MyClasses = () => {
                   })
                 }
               >
-                <View style={styles.content}>
-                  <Image
-                    source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                    style={styles.image}
-                  />
-                  <View style={styles.textView}>
-                    <Text style={styles.text}>{item.className}</Text>
-                    <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
+                <View style={styles.viewsContainer}>
+                  <View style={styles.content}>
+                    <Image
+                      source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                      style={styles.image}
+                    />
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>{item.className}</Text>
+                      <Text style={styles.nameText}>Code: {item.code}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.studentCount}>
+                    <Text style={styles.studentCountText}>
+                      {item.students.length - 1}
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -206,5 +213,22 @@ const styles = StyleSheet.create({
   textView: {
     justifyContent: "center",
     flexDirection: "column",
+  },
+  viewsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  studentCount: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 20,
+    height: 20,
+    backgroundColor: "#eee",
+    borderRadius: 10,
+  },
+  studentCountText: {
+    color: "#000",
+    fontSize: 12,
   },
 });
