@@ -38,10 +38,7 @@ const Classes = () => {
         }
       );
       const data = await response.json();
-      const sortedData = data.sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-      setClass(sortedData);
+      setClass(data);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -51,7 +48,7 @@ const Classes = () => {
     }
   };
 
-  const renderRightActions = (progress, classId, className, profile) => (
+  const renderRightActions = (progress, classId, classDescription, profile) => (
     <View style={{ width: 192, flexDirection: "row" }}>
       {renderRightAction(
         "Edit",
@@ -59,7 +56,11 @@ const Classes = () => {
         192,
         progress,
         () => {
-          navigation.navigate("UpdateClass", { classId, className, profile });
+          navigation.navigate("UpdateClass", {
+            classId,
+            classDescription,
+            profile,
+          });
         },
         "pencil"
       )}
@@ -141,13 +142,17 @@ const Classes = () => {
             >
               <TouchableOpacity
                 style={styles.container}
-                onPress={() => navigation.navigate("SubClass", { item })}
+                onPress={() =>
+                  navigation.navigate("SubClass", {
+                    classId: item._id,
+                    token: token,
+                    className: item.className,
+                  })
+                }
               >
                 <View style={styles.content}>
                   <Image
-                    source={{
-                      uri: item.classProfile,
-                    }}
+                    source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
                     style={styles.image}
                   />
                   <View style={styles.textView}>

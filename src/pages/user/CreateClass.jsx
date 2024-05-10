@@ -74,14 +74,7 @@ export default function CreateClass() {
     >
       <ScrollView>
         <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesome5 name="arrow-left" size={24} color="black" />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Create Class</Text>
-          </View>
           <View style={styles.form}>
-            <Text style={styles.text}>Class Name</Text>
             <TextInput
               style={styles.input}
               value={className}
@@ -103,7 +96,7 @@ export default function CreateClass() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    marginTop: 10,
     flex: 1,
     backgroundColor: "white",
     padding: 20,
@@ -120,14 +113,15 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
+    height: 100,
   },
   text: {
     fontSize: 16,
     marginBottom: 10,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+    backgroundColor: "#eee",
+    height: 50,
     padding: 10,
     marginBottom: 20,
     borderRadius: 5,
