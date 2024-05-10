@@ -17,7 +17,7 @@ import VerifyEmail from "./src/pages/auth/verifyOtp/VerifyEmail";
 import ForgotPass from "./src/pages/auth/resetPass/ForgotPass";
 import VerifyEmailResetPass from "./src/pages/auth/resetPass/VerifyEmailResetPass";
 import SetNewPass from "./src/pages/auth/resetPass/SetNewPass";
-import SubClass from "./src/pages/SubClasses";
+import SubClasses from "./src/pages/user/SubClasses";
 import CameraSelfie from "./src/pages/cameraSelfie";
 import GenerateCard from "./src/pages/user/GenerateCard";
 import CreateClass from "./src/pages/user/CreateClass";
@@ -107,30 +107,20 @@ export default function App() {
           options={{ title: " Back" }}
         />
         <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
-        <Stack.Screen name="CreateClass" component={CreateClassComponent} />
+        <Stack.Screen
+          name="CreateClass"
+          component={CreateClassComponent}
+          options={{
+            title: " Create Class",
+            headerShown: true,
+          }}
+        />
         <Stack.Screen
           name="UpdateClass"
           component={UpdateClassComponent}
           options={{
             headerShown: true,
             title: "Update Class",
-            headerRight: () => (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginRight: 10,
-                }}
-              >
-                <Button
-                  onPress={() => {
-                    route.params?.handleUpdateClass?.();
-                  }}
-                  title="Done"
-                  color="blue"
-                />
-              </View>
-            ),
           }}
         />
 
@@ -146,8 +136,11 @@ export default function App() {
         <Stack.Screen name="Classes" component={Classes} />
         <Stack.Screen
           name="SubClass"
-          component={SubClass}
-          options={{ headerShown: true, title: "Class name" }}
+          component={SubClasses}
+          options={({ route }) => ({
+            headerShown: true,
+            title: route.params.className,
+          })}
         />
         <Stack.Screen
           name="cameraSelfie"
