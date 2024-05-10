@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     flex: 1,
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     justifyContent: "center",
   },
   main: {
@@ -214,9 +214,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     height: 50,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#2F3791",
+    backgroundColor: "#eee",
     borderRadius: 10,
     padding: 10,
     flexDirection: "row",
