@@ -7,13 +7,10 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Swipeable } from "react-native-gesture-handler";
+
 import { API_URL, useUserData } from "../api/config";
-import { renderRightAction } from "./partials/Swapeable";
-import axios from "axios";
 
 const Classes = () => {
   const navigation = useNavigation();
@@ -29,7 +26,7 @@ const Classes = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/user/get-class-owner/${userId}`,
+        `${API_URL}/user/get-students-class/${userId}`,
         {
           method: "GET",
           headers: {
@@ -48,73 +45,6 @@ const Classes = () => {
     }
   };
 
-  const renderRightActions = (progress, classId, classDescription, profile) => (
-    <View style={{ width: 192, flexDirection: "row" }}>
-      {renderRightAction(
-        "Edit",
-        "#2F3791",
-        192,
-        progress,
-        () => {
-          navigation.navigate("UpdateClass", {
-            classId,
-            classDescription,
-            profile,
-          });
-        },
-        "pencil"
-      )}
-      {renderRightAction(
-        "Delete",
-        "#FF453A",
-        128,
-        progress,
-        () => {
-          Alert.alert("Delete", "Are you sure you want to delete this class?", [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-            {
-              text: "OK",
-              onPress: () => handleDelete(classId),
-              style: "destructive",
-            },
-          ]);
-        },
-        "trash"
-      )}
-    </View>
-  );
-
-  const handleDelete = async (classId) => {
-    try {
-      const response = await axios({
-        method: "delete",
-        url: `${API_URL}/class/delete-class/${classId}`,
-        data: {
-          userId,
-        },
-        headers: {
-          "auth-token": token,
-        },
-      });
-
-      if (response.status === 200) {
-        setLoading(false);
-        setClass(classData.filter((cls) => cls._id !== classId));
-      } else {
-        setLoading(false);
-        Alert.alert("Error", response.data.message);
-      }
-    } catch (error) {
-      setLoading(false);
-      Alert.alert("Error", "Something went wrong. Please try again");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <View style={styles.main}>
       {loading ? (
@@ -128,40 +58,27 @@ const Classes = () => {
           data={classData}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <Swipeable
-              friction={2}
-              rightThreshold={40}
-              renderRightActions={(progress) =>
-                renderRightActions(
-                  progress,
-                  item._id,
-                  item.className,
-                  item.classProfile
-                )
+            <TouchableOpacity
+              style={styles.container}
+              onPress={() =>
+                navigation.navigate("SubClass", {
+                  classId: item._id,
+                  token: token,
+                  className: item.className,
+                })
               }
             >
-              <TouchableOpacity
-                style={styles.container}
-                onPress={() =>
-                  navigation.navigate("SubClass", {
-                    classId: item._id,
-                    token: token,
-                    className: item.className,
-                  })
-                }
-              >
-                <View style={styles.content}>
-                  <Image
-                    source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                    style={styles.image}
-                  />
-                  <View style={styles.textView}>
-                    <Text style={styles.text}>{item.className}</Text>
-                    <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
-                  </View>
+              <View style={styles.content}>
+                <Image
+                  source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                  style={styles.image}
+                />
+                <View style={styles.textView}>
+                  <Text style={styles.text}>{item.className}</Text>
+                  <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
                 </View>
-              </TouchableOpacity>
-            </Swipeable>
+              </View>
+            </TouchableOpacity>
           )}
         />
       )}

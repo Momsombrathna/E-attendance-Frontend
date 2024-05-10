@@ -5,7 +5,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { TouchableOpacity, Button, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import Classes from "./src/pages/Classes";
@@ -24,6 +25,9 @@ import CreateClass from "./src/pages/user/CreateClass";
 import UpdateClass from "./src/pages/user/UpdateClass";
 import CreateSubClasses from "./src/pages/user/CreateSubClasses";
 import ViewSubClasses from "./src/pages/user/ViewSubClasses";
+import JoinClass from "./src/pages/user/JoinClass";
+import MyClasses from "./src/pages/MyClasses";
+import ViewMember from "./src/pages/user/ViewMember";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,11 +41,13 @@ function TabNavigator() {
           let iconName;
 
           if (route.name === "Classes") {
-            iconName = focused ? "book" : "book";
+            iconName = focused ? "building-o" : "building-o";
           } else if (route.name === "Settings") {
             iconName = focused ? "cog" : "cog";
           } else if (route.name === "Profile") {
             iconName = focused ? "user-circle-o" : "user-circle-o";
+          } else if (route.name === "MyClasses") {
+            iconName = focused ? "book" : "book";
           }
 
           // You can return any component that you like here!
@@ -55,14 +61,13 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen
-        name="Classes"
-        component={Classes}
+        name="MyClasses"
+        component={MyClasses}
         options={{
           headerRight: () => (
             <TouchableOpacity
               style={{
                 marginRight: 20,
-                backgroundColor: "#eee",
                 padding: 5,
                 width: 30,
                 height: 30,
@@ -84,6 +89,28 @@ function TabNavigator() {
           ),
         }}
       />
+      <Tab.Screen
+        name="Classes"
+        component={Classes}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{
+                marginRight: 20,
+                backgroundColor: "#eee",
+                padding: 10,
+                borderRadius: 15,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => navigation.navigate("JoinClass")}
+            >
+              <Text>Join</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
@@ -155,7 +182,7 @@ export default function App() {
         <Stack.Screen
           name="SubClass"
           component={SubClasses}
-          options={({ route }) => ({
+          options={({ route, navigation }) => ({
             headerShown: true,
             title: route.params.className,
             headerRight: () => (
@@ -164,7 +191,24 @@ export default function App() {
                 token={route.params.token}
               />
             ),
+            headerTitle: () => {
+              return (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("viewMembers")}
+                >
+                  <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    {route.params.className}
+                  </Text>
+                </TouchableOpacity>
+              );
+            },
+            title: "Back",
           })}
+        />
+        <Stack.Screen
+          name="viewMembers"
+          component={ViewMember}
+          options={{ headerShown: true, title: "Members" }}
         />
         <Stack.Screen
           name="cameraSelfie"
@@ -177,6 +221,14 @@ export default function App() {
           component={CreateClassComponent}
           options={{
             title: " Create Class",
+            headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="JoinClass"
+          component={JoinClass}
+          options={{
+            title: " Join Class",
             headerShown: true,
           }}
         />
