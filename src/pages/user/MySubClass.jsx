@@ -15,12 +15,11 @@ import { API_URL } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
-import { useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
 import { renderRightAction } from "../partials/Swapeable";
 import axios from "axios";
 
-export default function SubClasses({ route }) {
+export default function MySubClasses({ route }) {
   const { classId, token } = route.params;
   const [subClass, setSubClass] = useState({});
   const [loading, setLoading] = useState(false);
@@ -55,18 +54,90 @@ export default function SubClasses({ route }) {
     }
   };
 
-  // useEffect(() => {
-  //   getSubClass();
-  // }, [classId]);
+  useEffect(() => {
+    getSubClass();
+  }, [classId]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getSubClass();
-    }, [classId])
+  //   // console.log(token);
+  //   console.log(subClass.attendance);
+
+  const renderRightActions = (
+    progress,
+    subClassId,
+    description,
+    from,
+    to,
+    location_range
+  ) => (
+    <View style={{ width: 192, flexDirection: "row" }}>
+      {renderRightAction(
+        "Edit",
+        "#2F3791",
+        192,
+        progress,
+        () => {
+          navigation.navigate("Home", {
+            subClassId,
+            description,
+            from,
+            to,
+            location_range,
+          });
+        },
+        "edit",
+        90
+      )}
+      {renderRightAction(
+        "Delete",
+        "#FF453A",
+        128,
+        progress,
+        () => {
+          Alert.alert("Delete", "Are you sure you want to delete this class?", [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => handleDelete(subClassId),
+              style: "destructive",
+            },
+          ]);
+        },
+        "trash",
+        90
+      )}
+    </View>
   );
 
-  // console.log(token);
-  console.log(subClass.attendance);
+  const handleDelete = async (subClassId) => {
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `${API_URL}/attendance/delete-subclass/${subClassId}`,
+        data: {
+          userId,
+        },
+        headers: {
+          "auth-token": token,
+        },
+      });
+
+      if (response.status === 200) {
+        setLoading(false);
+        setSubClass(subClass.filter((cls) => cls._id !== subClassId));
+      } else {
+        setLoading(false);
+        Alert.alert("Error", response.data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", "Something went wrong. Please try again");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -85,14 +156,22 @@ export default function SubClasses({ route }) {
           data={subClass.attendance}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <>
+            <Swipeable
+              friction={2}
+              rightThreshold={40}
+              renderRightActions={(progress) =>
+                renderRightActions(
+                  progress,
+                  item.description,
+                  item.from,
+                  item.to,
+                  item.location_range
+                )
+              }
+            >
               <TouchableOpacity
                 style={styles.subClass}
-                onPress={() =>
-                  navigation.navigate("ViewSubClasses", {
-                    subClassId: item._id,
-                  })
-                }
+                onPress={() => Alert.alert("Subclass")}
               >
                 <View style={styles.body}>
                   <View>
@@ -115,54 +194,51 @@ export default function SubClasses({ route }) {
                       setModalVisible(true);
                     }}
                   >
-                    <Feather name="map-pin" size={30} color="#666" />
+                    <Feather name="map-pin" size={30} color="#2F3791" />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
-              <Modal
-                animationType="slide"
-                transparent={false}
-                visible={modalVisible}
-                onRequestClose={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <MapView
-                  style={styles.map}
-                  initialRegion={{
-                    latitude: currentLocation.latitude,
-                    longitude: currentLocation.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                  }}
-                >
-                  <Marker
-                    coordinate={{
-                      latitude: currentLocation.latitude,
-                      longitude: currentLocation.longitude,
-                    }}
-                  />
-                  <Circle
-                    center={{
-                      latitude: currentLocation.latitude,
-                      longitude: currentLocation.longitude,
-                    }}
-                    radius={Math.sqrt(
-                      (currentLocation.location_range * 1000000) / Math.PI
-                    )}
-                    fillColor="rgba(0, 0, 255, 0.1)"
-                    strokeColor="rgba(0, 0, 255, 0.5)"
-                  />
-                </MapView>
-                <Button
-                  title="Close Map"
-                  onPress={() => setModalVisible(false)}
-                />
-              </Modal>
-            </>
+            </Swipeable>
           )}
         />
       )}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        >
+          <Marker
+            coordinate={{
+              latitude: currentLocation.latitude,
+              longitude: currentLocation.longitude,
+            }}
+          />
+          <Circle
+            center={{
+              latitude: currentLocation.latitude,
+              longitude: currentLocation.longitude,
+            }}
+            radius={Math.sqrt(
+              (currentLocation.location_range * 1000000) / Math.PI
+            )}
+            fillColor="rgba(0, 0, 255, 0.1)"
+            strokeColor="rgba(0, 0, 255, 0.5)"
+          />
+        </MapView>
+        <Button title="Close Map" onPress={() => setModalVisible(false)} />
+      </Modal>
     </View>
   );
 }

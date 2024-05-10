@@ -145,7 +145,7 @@ const MyClasses = () => {
               <TouchableOpacity
                 style={styles.container}
                 onPress={() =>
-                  navigation.navigate("SubClass", {
+                  navigation.navigate("MySubClass", {
                     classId: item._id,
                     token: token,
                     className: item.className,

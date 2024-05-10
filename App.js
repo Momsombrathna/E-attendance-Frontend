@@ -28,6 +28,7 @@ import ViewSubClasses from "./src/pages/user/ViewSubClasses";
 import JoinClass from "./src/pages/user/JoinClass";
 import MyClasses from "./src/pages/MyClasses";
 import ViewMember from "./src/pages/user/ViewMember";
+import MySubClasses from "./src/pages/user/MySubClass";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,6 +65,7 @@ function TabNavigator() {
         name="MyClasses"
         component={MyClasses}
         options={{
+          title: "My Classes",
           headerRight: () => (
             <TouchableOpacity
               style={{
@@ -179,9 +181,10 @@ export default function App() {
         />
         <Stack.Screen name="SetNewPass" component={SetNewPass} />
         <Stack.Screen name="Classes" component={Classes} />
+
         <Stack.Screen
-          name="SubClass"
-          component={SubClasses}
+          name="My SubClass"
+          component={MySubClasses}
           options={({ route, navigation }) => ({
             headerShown: true,
             title: route.params.className,
@@ -191,6 +194,26 @@ export default function App() {
                 token={route.params.token}
               />
             ),
+            headerTitle: () => {
+              return (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("viewMembers")}
+                >
+                  <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    {route.params.className}
+                  </Text>
+                </TouchableOpacity>
+              );
+            },
+            title: "Back",
+          })}
+        />
+        <Stack.Screen
+          name="SubClass"
+          component={SubClasses}
+          options={({ route, navigation }) => ({
+            headerShown: true,
+            title: route.params.className,
             headerTitle: () => {
               return (
                 <TouchableOpacity
