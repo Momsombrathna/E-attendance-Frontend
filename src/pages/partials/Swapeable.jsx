@@ -15,7 +15,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const renderRightAction = (text, color, x, progress, onPress, iconName) => {
+const renderRightAction = (
+  text,
+  color,
+  x,
+  progress,
+  onPress,
+  iconName,
+  height
+) => {
   const trans = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [x, 0],
@@ -28,7 +36,7 @@ const renderRightAction = (text, color, x, progress, onPress, iconName) => {
           styles.rightAction,
           {
             backgroundColor: color,
-            minHeight: 70,
+            minHeight: height,
             alignItems: "center",
             justifyContent: "center",
           },
