@@ -226,7 +226,7 @@ export default function Register() {
             style={styles.icon}
           >
             <Icon
-              name={isPasswordVisible ? "eye-slash" : "eye"}
+              name={isPasswordVisible ? "eye" : "eye-slash"}
               size={20}
               color="gray"
             />
@@ -261,7 +261,7 @@ export default function Register() {
             style={styles.icon}
           >
             <Icon
-              name={isConfirmPasswordVisible ? "eye-slash" : "eye"}
+              name={isConfirmPasswordVisible ? "eye" : "eye-slash"}
               size={20}
               color="gray"
             />
