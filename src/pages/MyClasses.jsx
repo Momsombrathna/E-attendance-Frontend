@@ -49,7 +49,7 @@ const MyClasses = () => {
   };
 
   const renderRightActions = (progress, classId, classDescription, profile) => (
-    <View style={{ width: 192, flexDirection: "row" }}>
+    <View style={{ width: 190, flexDirection: "row" }}>
       {renderRightAction(
         "Edit",
         "#2F3791",
@@ -62,8 +62,8 @@ const MyClasses = () => {
             profile,
           });
         },
-        "pencil",
-        70
+        "pencil"
+        
       )}
       {renderRightAction(
         "Delete",
@@ -83,8 +83,7 @@ const MyClasses = () => {
             },
           ]);
         },
-        "trash",
-        70
+        "trash"
       )}
     </View>
   );
@@ -132,7 +131,7 @@ const MyClasses = () => {
           renderItem={({ item }) => (
             <Swipeable
               friction={2}
-              rightThreshold={40}
+              rightThreshold={1}
               renderRightActions={(progress) =>
                 renderRightActions(
                   progress,
@@ -187,9 +186,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   container: {
-    padding: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    padding: 10,
+    margin: 5,
+    borderStartColor: "#2F3791",
+    borderStartWidth: 8,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   content: {
     flexDirection: "row",

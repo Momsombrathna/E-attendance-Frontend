@@ -42,20 +42,41 @@ function TabNavigator() {
           let iconName;
 
           if (route.name === "Classes") {
-            iconName = focused ? "building-o" : "building-o";
+            iconName = "building-o";
           } else if (route.name === "Settings") {
-            iconName = focused ? "cog" : "cog";
+            iconName = "cog";
           } else if (route.name === "Profile") {
-            iconName = focused ? "user-circle-o" : "user-circle-o";
+            iconName = "user-circle-o";
           } else if (route.name === "MyClasses") {
-            iconName = focused ? "book" : "book";
+            iconName = "book";
           }
 
-          // You can return any component that you like here!
-          return <Icon name={iconName} size={size} color={color} />;
+          return (
+            <View
+              style={{
+                alignItems: "center",
+                flex: 1,
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
+            >
+              <View
+                style={{
+                  borderBottomRightRadius: 10,
+                  borderBottomLeftRadius: 10,
+                  backgroundColor: focused ? "#2F3791" : "#fff",
+                  height: 3,
+                  width: 70,
+                }}
+              />
+
+              <Icon name={iconName} size={size} color={color} />
+            </View>
+          );
         },
         tabBarActiveTintColor: "#2F3791",
         tabBarInactiveTintColor: "gray",
+        tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: "#fff",
         },
