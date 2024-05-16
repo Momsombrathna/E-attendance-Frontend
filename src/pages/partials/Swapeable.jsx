@@ -35,10 +35,15 @@ const renderRightAction = (
         style={[
           styles.rightAction,
           {
+            flex: 1,
+            margin: 5,
             backgroundColor: color,
             minHeight: height,
             alignItems: "center",
             justifyContent: "center",
+            borderRadius: 10,
+            elevation: 5,
+            shadowColor: "#000",
           },
         ]}
         onPress={onPress}

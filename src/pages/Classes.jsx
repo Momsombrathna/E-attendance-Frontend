@@ -97,10 +97,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   container: {
-    padding: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    padding: 10,
+    margin: 5,
+    borderStartColor: "#2F3791",
+    borderStartWidth: 5,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
+
   content: {
     flexDirection: "row",
     alignItems: "center",
