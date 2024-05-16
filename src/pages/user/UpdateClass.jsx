@@ -32,7 +32,7 @@ export default function UpdateClass({ route }) {
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.3,
+        quality: 0.5,
       });
 
       if (result.cancelled) {
@@ -147,7 +147,10 @@ export default function UpdateClass({ route }) {
       <View style={styles.content}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setImageModalVisible(true)}>
-            <Image source={{ uri: classImage }} style={styles.image} />
+            <Image
+              source={{ uri: `${classImage}?t=${Date.now()}` }}
+              style={styles.image}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={pickImage}>

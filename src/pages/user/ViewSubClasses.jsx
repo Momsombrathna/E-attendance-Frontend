@@ -68,12 +68,7 @@ export default function ViewSubClasses({ route }) {
         setError(data.message);
         throw new Error(data.message);
       } else {
-        Alert.alert("Success", "You have checked in successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.goBack(),
-          },
-        ]);
+        Alert.alert("Success", "You have checked in successfully");
         setIsCheckedIn(true);
       }
     } catch (error) {
@@ -106,12 +101,7 @@ export default function ViewSubClasses({ route }) {
         setError(data.message);
         throw new Error(data.message);
       } else {
-        Alert.alert("Success", "You have checked out successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.goBack(),
-          },
-        ]);
+        Alert.alert("Success", "You have checked out successfully");
       }
       setIsCheckedIn(false);
     } catch (error) {
@@ -158,16 +148,15 @@ export default function ViewSubClasses({ route }) {
                 <Text style={styles.buttonText}>Check In</Text>
               </TouchableOpacity>
             </Animated.View>
-            {isCheckedIn && (
-              <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-                <TouchableOpacity
-                  style={styles.checkedOutButton}
-                  onPress={handleCheckedIn}
-                >
-                  <Text style={styles.buttonText}>Check In</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            )}
+
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <TouchableOpacity
+                style={styles.checkedOutButton}
+                onPress={handleCheckedOut}
+              >
+                <Text style={styles.buttonText}>Check Out</Text>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
         </>
       )}
