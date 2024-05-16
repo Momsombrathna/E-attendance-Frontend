@@ -66,7 +66,7 @@ function TabNavigator() {
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
                   backgroundColor: focused ? "#2F3791" : "#fff",
-                  height: 3,
+                  height: 2,
                   width: 70,
                 }}
               />

@@ -85,7 +85,7 @@ export default function MySubClasses({ route }) {
           });
         },
         "edit",
-        100
+        
       )}
       {renderRightAction(
         "Delete",
@@ -106,7 +106,7 @@ export default function MySubClasses({ route }) {
           ]);
         },
         "trash",
-        100
+       
       )}
     </View>
   );
@@ -155,7 +155,7 @@ export default function MySubClasses({ route }) {
         <FlatList
           data={subClass.attendance}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
+          renderItem={({ item }) => ( 
             <Swipeable
               friction={2}
               rightThreshold={40}
