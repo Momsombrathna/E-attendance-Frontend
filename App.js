@@ -149,7 +149,6 @@ const HeaderRight = ({ classId, token }) => {
     <TouchableOpacity
       style={{
         marginRight: 20,
-        backgroundColor: "#eee",
         padding: 5,
         width: 30,
         height: 30,
@@ -267,7 +266,11 @@ export default function App() {
             component={CameraSelfie}
             options={{ headerShown: true, title: "Take a selfie" }}
           />
-          <Stack.Screen name="GenerateCard" component={GenerateCardComponent} />
+          <Stack.Screen
+            name="GenerateCard"
+            component={GenerateCardComponent}
+            options={{ title: "My Card" }}
+          />
           <Stack.Screen
             name="CreateClass"
             component={CreateClassComponent}
