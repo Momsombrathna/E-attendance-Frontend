@@ -16,9 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
 import { useFocusEffect } from "@react-navigation/native";
-import { Swipeable } from "react-native-gesture-handler";
-import { renderRightAction } from "../partials/Swapeable";
-import axios from "axios";
 
 export default function SubClasses({ route }) {
   const { classId, token } = route.params;
@@ -93,15 +90,31 @@ export default function SubClasses({ route }) {
                 }
               >
                 <View style={styles.body}>
-                  <View>
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <Text style={styles.subClassName}>{item.description}</Text>
-                    <Text style={styles.time}>
-                      {new Date(item.from).toLocaleTimeString()} -{" "}
-                      {new Date(item.to).toLocaleTimeString()}
-                    </Text>
-                    <Text style={styles.locationRange}>
-                      Location Range: {item.location_range}
-                    </Text>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text style={styles.time}>
+                        {new Intl.DateTimeFormat("default", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(new Date(item.from))}{" "}
+                        -{" "}
+                        {new Intl.DateTimeFormat("default", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(new Date(item.to))}
+                      </Text>
+                      <Text style={styles.locationRange}>
+                        Range: {item.location_range}
+                      </Text>
+                    </View>
                   </View>
                   <TouchableOpacity
                     onPress={() => {
@@ -172,21 +185,45 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   subClass: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    gap: 3,
+    padding: 10,
+    margin: 5,
+    borderStartColor: "#2F3791",
+    borderStartWidth: 5,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   subClassName: {
+    width: "80%",
+    height: "auto",
+    marginBottom: 5,
     fontSize: 18,
+    fontWeight: "bold",
   },
   time: {
     fontSize: 14,
     color: "#666",
+    marginBottom: 5,
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "#f2f2f2",
   },
   locationRange: {
     fontSize: 14,
     color: "#666",
+    marginBottom: 5,
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "#f2f2f2",
   },
   map: {
     width: "100%",

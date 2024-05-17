@@ -12,6 +12,7 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,26 +27,6 @@ export default function Profile() {
   const [user, setUser] = useState({});
   const [card, setCard] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        `Sorry, we need camera  
-             roll permission to upload images.`
-      );
-    } else {
-      const result = await ImagePicker.launchImageLibraryAsync();
-
-      if (!result.cancelled) {
-        setFile(result.uri);
-
-        setError(null);
-      }
-    }
-  };
 
   useEffect(() => {
     getUserData();
@@ -125,30 +106,46 @@ export default function Profile() {
     ]);
   };
 
-  const showToast = () => {
-    ToastAndroid.show("Button clicked!", ToastAndroid.SHORT);
+  const hashUserId = (userId) => {
+    if (!userId) {
+      return "";
+    }
+
+    let hash = 0;
+    for (let i = 0; i < userId.length; i++) {
+      let char = userId.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash % 1000000)
+      .toString()
+      .padStart(6, "0");
   };
+
+  // console.log(token);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity onPress={() => navigation.navigate("GenerateCard")}>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18 }}>
+              Log Out
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("GenerateCard", {
+                token: token,
+              })
+            }
+          >
             <Ionicons
-              name="duplicate"
+              name="pencil-sharp"
               size={30}
               color="black"
               style={{ marginRight: 25 }}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={{ marginRight: 25, fontWeight: "600" }}>Logout</Text>
-            {/* <Ionicons
-              name="log-out"
-              size={32}
-              color="red"
-              style={{ marginRight: 25 }}
-            /> */}
           </TouchableOpacity>
         </View>
       ),
@@ -160,133 +157,68 @@ export default function Profile() {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <ScrollView>
-          <View style={styles.container}>
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+        <ScrollView style={styles.container}>
+          <View style={{ alignItems: "center" }}>
+            <Image style={styles.image} source={{ uri: user.profile }} />
+            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+              {card.lastName} {card.firstName}
+            </Text>
+            <Text style={{ fontWeight: "300", fontSize: 14, color: "#7E7E7E" }}>
+              {user.email}
+            </Text>
+            <LinearGradient
+              style={[styles.card]}
+              colors={["#2F3791", "#8089EB"]}
+              start={{ x: 0, y: 0.7 }}
+              end={{ x: 0.3, y: 0 }}
             >
-              <Image style={styles.image} source={{ uri: user.profile }} />
-              <TouchableOpacity onPress={showToast}>
-                <Text
-                  style={{
-                    marginRight: 25,
-                    backgroundColor: "white",
-                    borderRadius: 25,
-                    padding: 8,
-                    shadowColor: "black",
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowRadius: 2.62,
-                    elevation: 4,
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                >
-                  Edit Profile
+              <View
+                style={[
+                  styles.rowItem,
+                  { justifyContent: "space-between", alignItems: "flex-start" },
+                ]}
+              >
+                <Text style={styles.header}>Student ID Card</Text>
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text
+                    style={[
+                      styles.text,
+                      {
+                        fontSize: 12,
+                        backgroundColor: user.verified ? "green" : "red",
+                        padding: 5,
+                        borderRadius: 5,
+                      },
+                    ]}
+                  >
+                    {user.verified ? "Verified" : "Not Verified"}
+                  </Text>
+                  <Text style={styles.text}>
+                    Student ID: {hashUserId(card.userId)}
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={[styles.rowItem, { justifyContent: "space-between" }]}
+              >
+                <Text style={styles.text}>
+                  <Text style={{ fontWeight: "bold" }}>Name: </Text>{" "}
+                  {card.lastName} {card.firstName}
                 </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                marginHorizontal: 15,
-                padding: 10,
-                borderRadius: 10,
-                backgroundColor: "#fff",
-                elevation: 2,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.text]}>First Name</Text>
-                  <TextInput
-                    style={[styles.input, { color: "black" }]}
-                    value={card.firstName}
-                    editable={false}
-                  />
-                </View>
-                <View style={{ flex: 0.1 }}></View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.text]}>Last Name</Text>
-                  <TextInput
-                    style={[styles.input, { color: "black" }]}
-                    value={card.lastName}
-                    editable={false}
-                  />
-                </View>
               </View>
-
-              <View style={{ marginTop: 8 }}>
-                <Text style={[styles.text]}>Username</Text>
-                <TextInput
-                  style={[styles.input, { color: "black" }]}
-                  value={user.username}
-                  editable={false}
-                />
-              </View>
-              <View style={{ marginTop: 8 }}>
-                <Text style={[styles.text]}>Email</Text>
-                <TextInput
-                  style={[styles.input, { color: "black" }]}
-                  value={user.email}
-                  editable={false}
-                  keyboardType="email-address"
-                />
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginTop: 8,
-                }}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.text]}>Role</Text>
-                  <TextInput
-                    style={[styles.input, { color: "black" }]}
-                    value={user.role === "admin" ? "Admin" : "Student"}
-                    editable={false}
-                  />
-                </View>
-                <View style={{ flex: 0.1 }}></View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.text]}>Gender</Text>
-                  <TextInput
-                    style={[styles.input, { color: "black" }]}
-                    value={card.sex}
-                    editable={false}
-                  />
-                </View>
-              </View>
-              <View style={{ marginTop: 8 }}>
-                <Text style={styles.text}>Phone Number </Text>
-                <TextInput
-                  style={[styles.input, { color: "black" }]}
-                  value={card.phoneNumber}
-                  editable={false}
-                  keyboardType="phone-pad"
-                />
-              </View>
-              <View style={{ marginTop: 8 }}>
-                <Text style={[styles.text]}>Address</Text>
-                <TextInput
-                  style={[styles.input, { color: "black" }]}
-                  value={card.address}
-                  editable={false}
-                />
-              </View>
-            </View>
+              <Text style={styles.text}>
+                <Text style={{ fontWeight: "bold" }}>Date of Birth:</Text>{" "}
+                {new Date(card.dateOfBirth).toLocaleDateString()}
+              </Text>
+              <Text style={styles.text}>
+                <Text style={{ fontWeight: "bold" }}>Gender: </Text> Gender:{" "}
+                {card.sex}
+              </Text>
+              <Text style={styles.text}>
+                <Text style={{ fontWeight: "bold" }}>Address: </Text>{" "}
+                {card.address}
+              </Text>
+            </LinearGradient>
             <View
               style={{
                 flex: 1,
@@ -298,17 +230,6 @@ export default function Profile() {
             >
               <Image style={styles.qrCode} source={{ uri: card.qrCode }} />
             </View>
-
-            {/* <View style={{ width: 150, alignItems: "center" }}>
-              <Button title="Logout" onPress={handleLogout} a />
-            </View>
-            <View style={{ marginTop: 8 }}></View>
-            <View style={{ width: 150 }}>
-              <Button
-                title="GenerateCard"
-                onPress={() => navigation.navigate("GenerateCard")}
-              />
-            </View> */}
           </View>
         </ScrollView>
       )}
@@ -320,38 +241,54 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // paddingHorizontal: 25,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 16,
-  },
-  text: {
-    fontSize: 18,
-    marginBottom: 8,
   },
   image: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 80,
     borderColor: "black",
     borderWidth: 1,
     objectFit: "fit",
-    marginLeft: 25,
-    marginVertical: 25,
+    marginTop: 25,
+    marginBottom: 5,
   },
-  input: {
-    height: 40,
-    borderColor: "#000000",
-    borderWidth: 1,
-    borderRadius: 10,
-    fontSize: 16,
-    borderWidth: 1,
+  header: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  text: {
+    fontSize: 14,
+    color: "white",
+  },
+  card: {
     padding: 10,
+    flexDirection: "column",
+    width: "90%",
+    height: 200,
+    borderRadius: 5,
+    marginTop: 25,
+    marginBottom: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  rowItem: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "100%",
   },
   qrCode: {
-    width: 200,
-    height: 200,
+    width: 320,
+    height: 320,
     borderRadius: 10,
     borderColor: "black",
     borderWidth: 1,
