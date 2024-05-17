@@ -163,7 +163,7 @@ export default function MySubClasses({ route }) {
               friction={2}
               rightThreshold={40}
               renderRightActions={(progress) =>
-                renderRightActions(
+                renderRightActions( 
                   progress,
                   item._id,
                   item.description,
@@ -180,8 +180,8 @@ export default function MySubClasses({ route }) {
                 onPress={() => Alert.alert("Subclass")}
               >
                 <View style={styles.body}>
-                  <View>
-                    <View style={styles.name}>
+                  <View style={styles.name}>
+                    <View>
                       <Text
                         numberOfLines={1}
                         ellipsizeMode="tail"
@@ -190,20 +190,6 @@ export default function MySubClasses({ route }) {
                         {item.description}
                       </Text>
                     </View>
-                    <Text style={styles.time}>
-                      {new Intl.DateTimeFormat("default", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(new Date(item.from))}{" "}
-                      -{" "}
-                      {new Intl.DateTimeFormat("default", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(new Date(item.to))}
-                    </Text>
-                    <Text style={styles.locationRange}>
-                      Range: {item.location_range}
-                    </Text>
                     <Text style={styles.dateRange}>
                       {new Intl.DateTimeFormat("default", {
                         day: "2-digit",
@@ -212,23 +198,52 @@ export default function MySubClasses({ route }) {
                       }).format(new Date(item.created))}
                     </Text>
                   </View>
-                  <View style={styles.checkedInCountContainer}>
-                    <Text style={styles.checkedInCount}>
-                      {
-                        item.attendances.filter(
-                          (attendance) => attendance.checkedIn
-                        ).length
-                      }
-                    </Text>
-                  </View>
-                  <View style={styles.checkedOutCountContainer}>
-                    <Text style={styles.checkedOutCount}>
-                      {
-                        item.attendances.filter(
-                          (attendance) => attendance.checkedOut
-                        ).length
-                      }
-                    </Text>
+
+                  <View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={styles.time}>
+                        {new Intl.DateTimeFormat("default", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(new Date(item.from))}{" "}
+                        -{" "}
+                        {new Intl.DateTimeFormat("default", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(new Date(item.to))}
+                      </Text>
+                      <Text style={styles.locationRange}>
+                        Range: {item.location_range}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View style={styles.checkedInCountContainer}>
+                        <Text style={styles.checkedInCount}>
+                          {"checked in: " +
+                            item.attendances.filter(
+                              (attendance) => attendance.checkedIn
+                            ).length}
+                        </Text>
+                      </View>
+                      <View style={styles.checkedOutCountContainer}>
+                        <Text style={styles.checkedOutCount}>
+                          {"Check out: " +
+                            item.attendances.filter(
+                              (attendance) => attendance.checkedOut
+                            ).length}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
 
                   <TouchableOpacity
@@ -294,28 +309,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingHorizontal: 5,
   },
   subClass: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    gap: 3,
+    margin: 5,
+    borderStartColor: "#2F3791",
+    borderStartWidth: 5,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   subClassName: {
     fontSize: 18,
+    fontWeight: "bold",
   },
   name: {
-    maxWidth: 150,
-    width: 150,
+    maxWidth: 100,
     marginBottom: 5,
   },
   time: {
     fontSize: 14,
     color: "#666",
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "#f2f2f2",
   },
   locationRange: {
     fontSize: 14,
     color: "#666",
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "#f2f2f2",
   },
   map: {
     width: "100%",
@@ -328,7 +362,10 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-
+    color: "#666",
+  },
+  dateRange: {
+    fontSize: 14,
     color: "#666",
   },
   checkedInCount: {
@@ -341,20 +378,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     padding: 5,
   },
-  dateRange: {
-    fontSize: 14,
-    color: "#666",
-  },
+
   checkedInCountContainer: {
     backgroundColor: "green",
+    maxWidth: 100,
     opacity: 0.8,
+    marginTop: 5,
+    marginRight: 5,
+    padding: 3,
     borderRadius: 5,
-    margin: 5,
   },
   checkedOutCountContainer: {
-    backgroundColor: "purple",
+    backgroundColor: "red",
+    maxWidth: 100,
     opacity: 0.8,
+    marginTop: 5,
+    marginRight: 5,
+    padding: 3,
     borderRadius: 5,
-    margin: 5,
   },
 });
