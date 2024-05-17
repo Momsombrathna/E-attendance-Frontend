@@ -1,40 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { API_URL, useUserData } from "../../api/config";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  FlatList,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
-  Modal,
-  Button,
-  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
   ActivityIndicator,
+  Alert,
+  TextInput,
+  Button,
+  Platform,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import Feather from "react-native-vector-icons/Feather";
-import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as Location from "expo-location";
+import { useNavigation } from "@react-navigation/native";
+import { useUserData, API_URL } from "../../api/config";
+import axios from "axios";
 
-export default function CreateSubClasses({ route }) {
-  const { classId, token } = route.params;
+export default function EditMySubClass({ route }) {
+  const { subClassId, _description, start, end, rang, lat, lon } = route.params;
+  const [description, setDescription] = useState(_description);
+  const [from, setFrom] = useState(new Date(start));
+  const [to, setTo] = useState(new Date(end));
+  const navigation = useNavigation();
+  const { userId, token } = useUserData();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [description, setDescription] = useState("");
-  const [from, setFrom] = useState(new Date());
-  const [to, setTo] = useState(new Date());
-  const [location_range, setLocation_range] = useState("");
-  const navigation = useNavigation();
-  const { userId } = useUserData();
   const [isFromPickerVisible, setFromPickerVisible] = useState(false);
   const [isToPickerVisible, setToPickerVisible] = useState(false);
-  const [region, setRegion] = useState(null);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
+  const [location_range, setLocationRange] = useState(String(rang));
+  const [latitude, setLatitude] = useState(lat);
+  const [longitude, setLongitude] = useState(lon);
   const [isLoading, setIsLoading] = useState(true);
+  const [region, setRegion] = useState(null);
 
   const showFromPicker = () => {
     setFromPickerVisible(true);
@@ -77,8 +77,8 @@ export default function CreateSubClasses({ route }) {
       setLatitude(location.coords.latitude);
       setLongitude(location.coords.longitude);
       setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: lat,
+        longitude: lon,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
@@ -94,55 +94,34 @@ export default function CreateSubClasses({ route }) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(
-        `${API_URL}/attendance/create-timeline/${classId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": token,
-          },
-          body: JSON.stringify({
-            userId,
-            description,
-            from: from.toISOString(),
-            to: to.toISOString(),
-            location_range,
-            latitude,
-            longitude,
-          }),
-        }
-      );
+      const response = await axios({
+        method: "PATCH",
+        url: `${API_URL}/attendance/edit-timeline/${subClassId}`,
+        data: {
+          userId,
+          description,
+          from,
+          to,
+          location_range,
+          latitude,
+          longitude,
+        },
+        headers: {
+          "auth-token": token,
+        },
+      });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setLoading(false);
-        const data = await response.json();
-        setDescription("");
-        setLocation_range("");
-        setFrom(new Date());
-        setTo(new Date());
-        setRegion(null);
-        setLatitude(null);
-        setLongitude(null);
         navigation.goBack();
-      }
-
-      if (response.status === 400) {
+      } else {
         setLoading(false);
-        const data = await response.json();
-        setError(data.message);
-      }
-
-      if (!response.ok) {
-        setLoading(false);
-        const data = await response.json();
-        setError(data.message);
+        setError(response.data.message);
       }
     } catch (error) {
-      setError("Something went wrong. Please try again");
+      setLoading(false);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -201,7 +180,7 @@ export default function CreateSubClasses({ route }) {
           style={styles.input}
           placeholder="Location Range"
           value={location_range}
-          onChangeText={setLocation_range}
+          onChangeText={setLocationRange}
         />
 
         <Text style={styles.label}>Location</Text>

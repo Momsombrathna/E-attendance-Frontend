@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,22 +10,61 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
+import { API_URL, useUserData } from "../../api/config";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-const dummyData = [
-  {
-    _id: "1",
-    profile: "https://example.com/image1.jpg",
-    username: "User 1",
-    role: "user",
-  },
-  {
-    _id: "2",
-    profile: "https://example.com/image2.jpg",
-    username: "User 2",
-    role: "user",
-  },
-  // Add more dummy data here...
-];
+export default function ViewMember({ route }) {
+  const { classId, token } = route.params;
+  const { userId } = useUserData();
+  const [getClass, setGetClass] = useState({});
+  const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigation = useNavigation();
+
+  const getClassData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/class/get-class/${classId}`, {
+        method: "GET",
+        headers: {
+          "auth-token": token,
+        },
+      });
+      const data = await response.json();
+      setGetClass(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getClassData();
+    }, [classId])
+  );
+
+  console.log(getClass.students);
+
+  return (
+    <View style={styles.main}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={getClass.students}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => <Text> {item}</Text>}
+        />
+      )}
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   main: {
@@ -62,41 +101,3 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
 });
-
-const ViewMember = () => {
-  const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
-
-  return (
-    <View style={styles.main}>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color="#eee" />
-        </View>
-      ) : (
-        <FlatList
-          data={dummyData}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.content}>
-              <Image
-                source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                style={styles.image}
-              />
-              <View style={styles.textView}>
-                <Text style={styles.text}>{item.username}</Text>
-                <Text style={styles.nameText}>
-                  Role: {item.role === "admin" ? "Admin" : "Student"}
-                </Text>
-              </View>
-            </View>
-          )}
-        />
-      )}
-    </View>
-  );
-};
-
-export default ViewMember;

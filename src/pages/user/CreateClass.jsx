@@ -76,17 +76,17 @@ export default function CreateClass() {
         <View style={styles.container}>
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, error && styles.errorInput]}
               value={className}
               placeholder="Enter class name"
               onChangeText={setClassName}
             />
-            {error && <Text style={styles.error}>{error}</Text>}
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>
                 {loading ? <ActivityIndicator color="white" /> : "Create"}
               </Text>
             </TouchableOpacity>
+            {error && <Text style={styles.error}>{error}</Text>}
           </View>
         </View>
       </ScrollView>
@@ -137,7 +137,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   error: {
+    marginTop: 10,
+    paddingHorizontal: 10,
     color: "red",
     fontSize: 16,
+  },
+  errorInput: {
+    borderColor: "red",
+    borderWidth: 1,
   },
 });

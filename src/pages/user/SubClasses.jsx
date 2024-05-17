@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
     height: "auto",
     marginBottom: 5,
     fontSize: 18,
+    maxWidth: "80%",
     fontWeight: "bold",
   },
   time: {

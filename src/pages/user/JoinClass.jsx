@@ -54,8 +54,7 @@ export default function JoinClass() {
         navigation.goBack();
       }
     } catch (error) {
-      setError("An error occurred. Please try again later");
-      console.log(error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -68,21 +67,22 @@ export default function JoinClass() {
     >
       <ScrollView>
         <View style={styles.container}>
-          <View style={[styles.inputContainer, error && styles.inputError]}>
+          <View style={styles.inputContainer}>
             <TextInput
               type="text"
-              style={styles.input}
+              style={[styles.input, error && styles.inputError]}
               value={code}
               onChangeText={(text) => setCode(text)}
               placeholder="Enter Invite Code"
             />
           </View>
-          {error && <Text style={styles.error}>{error}</Text>}
+
           <TouchableOpacity style={styles.button} onPress={joinClass}>
             <Text style={styles.buttonText}>
               {loading ? <ActivityIndicator color="white" /> : "Join"}
             </Text>
           </TouchableOpacity>
+          {error && <Text style={styles.error}>{error}</Text>}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -107,9 +107,6 @@ const styles = StyleSheet.create({
     padding: 10,
     height: 50,
   },
-  inputError: {
-    borderColor: "red",
-  },
   button: {
     width: "100%",
     padding: 15,
@@ -124,6 +121,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
-    marginBottom: 10,
+    marginTop: 10,
+  },
+  inputError: {
+    borderColor: "red",
+    borderWidth: 1,
+    borderRadius: 5,
   },
 });
