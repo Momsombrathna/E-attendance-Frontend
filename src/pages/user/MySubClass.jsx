@@ -11,7 +11,7 @@ import {
   Button,
   ActivityIndicator,
 } from "react-native";
-import { API_URL } from "../../api/config";
+import { API_URL, useUserData } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
@@ -22,6 +22,7 @@ import axios from "axios";
 
 export default function MySubClasses({ route }) {
   const { classId, token } = route.params;
+  const { userId } = useUserData();
   const [subClass, setSubClass] = useState({});
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
@@ -64,10 +65,12 @@ export default function MySubClasses({ route }) {
   const renderRightActions = (
     progress,
     subClassId,
-    description,
-    from,
-    to,
-    location_range
+    _description,
+    start,
+    end,
+    rang,
+    lat,
+    lon
   ) => (
     <View style={{ width: 192, flexDirection: "row" }}>
       {renderRightAction(
@@ -76,16 +79,17 @@ export default function MySubClasses({ route }) {
         192,
         progress,
         () => {
-          navigation.navigate("Home", {
+          navigation.navigate("EditMySubClass", {
             subClassId,
-            description,
-            from,
-            to,
-            location_range,
+            _description,
+            start,
+            end,
+            rang,
+            lat,
+            lon,
           });
         },
-        "edit",
-        
+        "edit"
       )}
       {renderRightAction(
         "Delete",
@@ -105,8 +109,7 @@ export default function MySubClasses({ route }) {
             },
           ]);
         },
-        "trash",
-       
+        "trash"
       )}
     </View>
   );
@@ -115,7 +118,7 @@ export default function MySubClasses({ route }) {
     try {
       const response = await axios({
         method: "delete",
-        url: `${API_URL}/attendance/delete-subclass/${subClassId}`,
+        url: `${API_URL}/attendance/delete-timeline/${subClassId}`,
         data: {
           userId,
         },
@@ -126,14 +129,14 @@ export default function MySubClasses({ route }) {
 
       if (response.status === 200) {
         setLoading(false);
-        setSubClass(subClass.filter((cls) => cls._id !== subClassId));
+        getSubClass();
       } else {
         setLoading(false);
         Alert.alert("Error", response.data.message);
       }
     } catch (error) {
       setLoading(false);
-      Alert.alert("Error", "Something went wrong. Please try again");
+      Alert.alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -155,17 +158,20 @@ export default function MySubClasses({ route }) {
         <FlatList
           data={subClass.attendance}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => ( 
+          renderItem={({ item }) => (
             <Swipeable
               friction={2}
               rightThreshold={40}
               renderRightActions={(progress) =>
                 renderRightActions(
                   progress,
+                  item._id,
                   item.description,
                   item.from,
                   item.to,
-                  item.location_range
+                  item.location_range,
+                  item.latitude,
+                  item.longitude
                 )
               }
             >

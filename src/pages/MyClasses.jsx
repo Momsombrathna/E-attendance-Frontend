@@ -63,7 +63,6 @@ const MyClasses = () => {
           });
         },
         "pencil"
-        
       )}
       {renderRightAction(
         "Delete",
@@ -129,47 +128,55 @@ const MyClasses = () => {
           data={classData}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <Swipeable
-              friction={2}
-              rightThreshold={1}
-              renderRightActions={(progress) =>
-                renderRightActions(
-                  progress,
-                  item._id,
-                  item.className,
-                  item.classProfile
-                )
-              }
-            >
-              <TouchableOpacity
-                style={styles.container}
-                onPress={() =>
-                  navigation.navigate("MySubClass", {
-                    classId: item._id,
-                    token: token,
-                    className: item.className,
-                  })
+            <View style={{ margin: -2 }}>
+              <Swipeable
+                friction={2}
+                rightThreshold={1}
+                renderRightActions={(progress) =>
+                  renderRightActions(
+                    progress,
+                    item._id,
+                    item.className,
+                    item.classProfile
+                  )
                 }
               >
-                <View style={styles.viewsContainer}>
-                  <View style={styles.content}>
-                    <Image
-                      source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                      style={styles.image}
-                    />
-                    <View style={styles.textView}>
-                      <Text style={styles.text}>{item.className}</Text>
-                      <Text style={styles.nameText}>Code: {item.code}</Text>
+                <TouchableOpacity
+                  style={styles.container}
+                  onPress={() =>
+                    navigation.navigate("MySubClass", {
+                      classId: item._id,
+                      token: token,
+                      className: item.className,
+                    })
+                  }
+                >
+                  <View style={styles.viewsContainer}>
+                    <View style={styles.content}>
+                      <Image
+                        source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                        style={styles.image}
+                      />
+                      <View style={styles.textView}>
+                        <Text
+                          style={styles.text}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {item.className}
+                        </Text>
+                        <Text style={styles.nameText}>Code: {item.code}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.studentCount}>
+                      <Text style={styles.studentCountText}>
+                        {item.students.length - 1}
+                      </Text>
                     </View>
                   </View>
-                  <View style={styles.studentCount}>
-                    <Text style={styles.studentCountText}>
-                      {item.students.length - 1}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Swipeable>
+                </TouchableOpacity>
+              </Swipeable>
+            </View>
           )}
         />
       )}
@@ -190,14 +197,14 @@ const styles = StyleSheet.create({
     margin: 5,
     borderStartColor: "#2F3791",
     borderStartWidth: 5,
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: "#FFFFFF",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.22,
     shadowRadius: 3.84,
     elevation: 5,
   },
@@ -214,6 +221,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
+    maxWidth: 200,
   },
   nameText: {
     marginTop: 5,

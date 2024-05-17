@@ -94,7 +94,13 @@ export default function SubClasses({ route }) {
               >
                 <View style={styles.body}>
                   <View>
-                    <Text style={styles.subClassName}>{item.description}</Text>
+                    <Text
+                      style={styles.subClassName}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.description}
+                    </Text>
                     <Text style={styles.time}>
                       {new Date(item.from).toLocaleTimeString()} -{" "}
                       {new Date(item.to).toLocaleTimeString()}
@@ -179,6 +185,7 @@ const styles = StyleSheet.create({
   },
   subClassName: {
     fontSize: 18,
+    maxWidth: "80%",
   },
   time: {
     fontSize: 14,

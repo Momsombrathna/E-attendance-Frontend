@@ -60,27 +60,35 @@ const Classes = () => {
           data={classData}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.container}
-              onPress={() =>
-                navigation.navigate("SubClass", {
-                  classId: item._id,
-                  token: token,
-                  className: item.className,
-                })
-              }
-            >
-              <View style={styles.content}>
-                <Image
-                  source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                  style={styles.image}
-                />
-                <View style={styles.textView}>
-                  <Text style={styles.text}>{item.className}</Text>
-                  <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
+            <View style={{ margin: -2 }}>
+              <TouchableOpacity
+                style={styles.container}
+                onPress={() =>
+                  navigation.navigate("SubClass", {
+                    classId: item._id,
+                    token: token,
+                    className: item.className,
+                  })
+                }
+              >
+                <View style={styles.content}>
+                  <Image
+                    source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                    style={styles.image}
+                  />
+                  <View style={styles.textView}>
+                    <Text
+                      style={styles.text}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.className}
+                    </Text>
+                    <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           )}
         />
       )}
@@ -101,7 +109,7 @@ const styles = StyleSheet.create({
     margin: 5,
     borderStartColor: "#2F3791",
     borderStartWidth: 5,
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: "#FFFFFF",
     shadowColor: "#000",
     shadowOffset: {

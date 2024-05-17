@@ -30,6 +30,7 @@ import JoinClass from "./src/pages/user/JoinClass";
 import MyClasses from "./src/pages/MyClasses";
 import ViewMember from "./src/pages/user/ViewMember";
 import MySubClasses from "./src/pages/user/MySubClass";
+import EditMySubClass from "./src/pages/user/EditMySubClass";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -149,7 +150,6 @@ const HeaderRight = ({ classId, token }) => {
     <TouchableOpacity
       style={{
         marginRight: 20,
-        backgroundColor: "#eee",
         padding: 5,
         width: 30,
         height: 30,
@@ -179,6 +179,7 @@ const CreateClassComponent = withAuthProtection(CreateClass);
 const UpdateClassComponent = withAuthProtection(UpdateClass);
 const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
 const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
+const EditMySubClassComponent = withAuthProtection(EditMySubClass);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -226,7 +227,12 @@ export default function App() {
               headerTitle: () => {
                 return (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("viewMembers")}
+                    onPress={() =>
+                      navigation.navigate("viewMembers", {
+                        classId: route.params.classId,
+                        token: route.params.token,
+                      })
+                    }
                   >
                     <Text style={{ fontWeight: "600", fontSize: 16 }}>
                       {route.params.className}
@@ -307,6 +313,14 @@ export default function App() {
             options={{
               headerShown: true,
               title: "View Subclass",
+            }}
+          />
+          <Stack.Screen
+            name="EditMySubClass"
+            component={EditMySubClassComponent}
+            options={{
+              headerShown: true,
+              title: "Edit Subclass",
             }}
           />
         </Stack.Navigator>
