@@ -52,15 +52,13 @@ export default function SubClasses({ route }) {
     }
   };
 
-  // useEffect(() => {
-  //   getSubClass();
-  // }, [classId]);
-
   useFocusEffect(
     React.useCallback(() => {
       getSubClass();
     }, [classId])
   );
+
+  console.log(subClass);
 
   return (
     <View style={styles.container}>
@@ -97,6 +95,7 @@ export default function SubClasses({ route }) {
                     }}
                   >
                     <Text style={styles.subClassName}>{item.description}</Text>
+
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
