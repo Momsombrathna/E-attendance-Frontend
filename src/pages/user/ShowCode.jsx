@@ -79,7 +79,7 @@ export default function ShowCode({ route }) {
               </View>
             </View>
             <View style={styles.button}>
-              <Button title="Refresh Code" onPress={handleRefreshCode} />
+              <Button title="Reset Code" onPress={handleRefreshCode} />
             </View>
           </>
         )}
