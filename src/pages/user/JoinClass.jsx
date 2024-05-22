@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function JoinClass() {
   const { userId, token } = useUserData();

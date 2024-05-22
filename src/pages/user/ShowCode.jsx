@@ -1,20 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  Button,
   ActivityIndicator,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { API_URL } from "../../api/config";
 import axios from "axios";
+import ViewShot from "react-native-view-shot";
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function ShowCode({ route }) {
   const { code, classId, token } = route.params;
   const [codeData, setCodeData] = useState(code.toString());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const viewShotRef = useRef();
 
   const handleRefreshCode = async () => {
     setLoading(true);
@@ -44,6 +50,17 @@ export default function ShowCode({ route }) {
     return qrCode;
   };
 
+  const captureAndSaveImage = async () => {
+    try {
+      const uri = await viewShotRef.current.capture();
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert("Success", "Image saved to device!");
+    } catch (error) {
+      console.error("Error saving image to device:", error);
+      Alert.alert("Error", "Failed to save image to device");
+    }
+  };
+
   return (
     <View style={styles.main}>
       <View style={styles.container}>
@@ -55,31 +72,54 @@ export default function ShowCode({ route }) {
               alignItems: "center",
             }}
           >
-            <ActivityIndicator size="large" color="#0000ff" />
+            <ActivityIndicator size="large" color="#eee" />
           </View>
         ) : (
           <>
-            <Text style={styles.text}>Scan the QR code to join the class</Text>
+            <ViewShot
+              ref={viewShotRef}
+              style={{
+                padding: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              options={{ format: "jpg", quality: 1.0 }}
+            >
+              <Text style={styles.text}>
+                Scan the QR code to join the class
+              </Text>
 
-            <View style={styles.qrCodeContainer}>
-              <Image
-                source={{ uri: textToQrCode() }}
-                style={{
-                  width: 200,
-                  height: 200,
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}
-              />
-            </View>
-            <View style={styles.codeContainer}>
-              <Text style={styles.text}>Or enter this code: </Text>
-              <View style={styles.codeText}>
-                <Text style={{ color: "#fff", fontSize: 18 }}>{codeData}</Text>
+              <View style={styles.qrCodeContainer}>
+                <Image
+                  source={{ uri: textToQrCode() }}
+                  style={{
+                    width: 200,
+                    height: 200,
+                    marginTop: 10,
+                    marginBottom: 10,
+                  }}
+                />
               </View>
-            </View>
-            <View style={styles.button}>
-              <Button title="Reset Code" onPress={handleRefreshCode} />
+
+              <View style={styles.codeContainer}>
+                <Text style={styles.text}>Or enter this code: </Text>
+                <View style={styles.codeText}>
+                  <Text style={{ color: "#fff", fontSize: 18 }}>
+                    {codeData}
+                  </Text>
+                </View>
+              </View>
+            </ViewShot>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.icon} onPress={handleRefreshCode}>
+                <Icon name="refresh" size={24} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.icon}
+                onPress={captureAndSaveImage}
+              >
+                <Icon name="download" size={24} color="#fff" />
+              </TouchableOpacity>
             </View>
           </>
         )}
@@ -108,6 +148,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     margin: 5,
+    textAlign: "center",
   },
   classText: {
     marginTop: 10,
@@ -126,13 +167,8 @@ const styles = StyleSheet.create({
   },
 
   qrCodeContainer: {
-    marginTop: 10,
-    padding: 10,
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    borderColor: "#6D78C4",
-    borderWidth: 5,
-    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
   },
   codeContainer: {
@@ -147,8 +183,16 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
   },
-  button: {
-    marginTop: 50,
-    width: 150,
+  buttonContainer: {
+    marginTop: 30,
+    display: "flex",
+    flexDirection: "row",
+    gap: 20,
+    justifyContent: "space-between",
+  },
+  icon: {
+    padding: 10,
+    backgroundColor: "#2F3791",
+    borderRadius: 5,
   },
 });
