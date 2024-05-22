@@ -147,7 +147,7 @@ const MyClasses = () => {
                     navigation.navigate("MySubClass", {
                       classId: item._id,
                       token: token,
-                      className: item.className,
+                      code: item.code,
                     })
                   }
                 >
@@ -165,7 +165,6 @@ const MyClasses = () => {
                         >
                           {item.className}
                         </Text>
-                        <Text style={styles.nameText}>Code: {item.code}</Text>
                       </View>
                     </View>
                   </View>
