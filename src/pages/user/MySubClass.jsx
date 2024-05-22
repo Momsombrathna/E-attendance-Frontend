@@ -163,7 +163,7 @@ export default function MySubClasses({ route }) {
               friction={2}
               rightThreshold={40}
               renderRightActions={(progress) =>
-                renderRightActions( 
+                renderRightActions(
                   progress,
                   item._id,
                   item.description,
@@ -177,7 +177,7 @@ export default function MySubClasses({ route }) {
             >
               <TouchableOpacity
                 style={styles.subClass}
-                onPress={() => Alert.alert("Subclass")}
+                onPress={() => navigation.navigate("CheckMember", { item })}
               >
                 <View style={styles.body}>
                   <View style={styles.name}>

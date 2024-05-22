@@ -31,6 +31,7 @@ import MyClasses from "./src/pages/MyClasses";
 import ViewMember from "./src/pages/user/ViewMember";
 import MySubClasses from "./src/pages/user/MySubClass";
 import EditMySubClass from "./src/pages/user/EditMySubClass";
+import CheckMember from "./src/pages/user/CheckMember";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -180,6 +181,7 @@ const UpdateClassComponent = withAuthProtection(UpdateClass);
 const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
 const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
 const EditMySubClassComponent = withAuthProtection(EditMySubClass);
+const CheckMemberComponent = withAuthProtection(CheckMember);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -325,6 +327,14 @@ export default function App() {
             options={{
               headerShown: true,
               title: "Edit Subclass",
+            }}
+          />
+          <Stack.Screen
+            name="CheckMember"
+            component={CheckMemberComponent}
+            options={{
+              headerShown: true,
+              title: "Attendance",
             }}
           />
         </Stack.Navigator>

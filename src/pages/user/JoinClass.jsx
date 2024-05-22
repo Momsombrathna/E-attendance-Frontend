@@ -32,19 +32,17 @@ export default function JoinClass() {
     }
 
     try {
-      const response = await fetch(
-        `${API_URL}/class/invite-by-code/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": token,
-          },
-          body: JSON.stringify({
-            code,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/class/invite-by-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": token,
+        },
+        body: JSON.stringify({
+          code,
+          userId,
+        }),
+      });
 
       if (!response.ok) {
         const data = await response.json();
