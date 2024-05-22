@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -14,12 +14,14 @@ import { Swipeable } from "react-native-gesture-handler";
 import { API_URL, useUserData } from "../api/config";
 import { renderRightAction } from "./partials/Swapeable";
 import axios from "axios";
-
+import { ThemeContext } from "../hooks/ThemeContext";
 const MyClasses = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [classData, setClass] = useState({});
   const { token, userId } = useUserData();
+
+  const { darkMode } = useContext(ThemeContext);
 
   useEffect(() => {
     getClassData();
@@ -115,6 +117,8 @@ const MyClasses = () => {
     }
   };
 
+  const styles = darkMode ? darkStyles : lightStyles;
+
   return (
     <View style={styles.main}>
       {loading ? (
@@ -186,7 +190,93 @@ const MyClasses = () => {
 
 export default MyClasses;
 
-const styles = StyleSheet.create({
+// const styles = StyleSheet.create({
+//   main: {
+//     flex: 1,
+//     backgroundColor: "#fff",
+//     paddingHorizontal: 5,
+//   },
+//   container: {
+//     padding: 10,
+//     margin: 5,
+//     borderStartColor: "#2F3791",
+//     borderStartWidth: 5,
+//     borderRadius: 5,
+//     backgroundColor: "#FFFFFF",
+//     shadowColor: "#000",
+//     shadowOffset: {
+//       width: 0,
+//       height: 1,
+//     },
+//     shadowOpacity: 0.22,
+//     shadowRadius: 3.84,
+//     elevation: 5,
+//   },
+//   content: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     height: 60,
+//   },
+//   image: {
+//     width: 60,
+//     height: 60,
+//     borderRadius: 30,
+//     marginRight: 10,
+//   },
+//   text: {
+//     fontSize: 18,
+//     maxWidth: 200,
+//   },
+//   nameText: {
+//     marginTop: 5,
+//     fontSize: 14,
+//     color: "#666",
+//   },
+//   textView: {
+//     justifyContent: "center",
+//     flexDirection: "column",
+//   },
+//   viewsContainer: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//   },
+//   studentCount: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//     width: 20,
+//     height: 20,
+//     backgroundColor: "#eee",
+//     borderRadius: 10,
+//   },
+//   studentCountText: {
+//     color: "#000",
+//     fontSize: 12,
+//   },
+// });
+
+// const darkStyles = StyleSheet.create({
+//   container: {
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     backgroundColor: "#333",
+//   },
+//   studentCount: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//     width: 20,
+//     height: 20,
+//     backgroundColor: "#555",
+//     borderRadius: 10,
+//   },
+//   studentCountText: {
+//     color: "#fff",
+//     fontSize: 12,
+//   },
+// });
+
+
+const lightStyles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: "#fff",
@@ -248,5 +338,34 @@ const styles = StyleSheet.create({
   studentCountText: {
     color: "#000",
     fontSize: 12,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  ...lightStyles,
+  main: {
+    ...lightStyles.main,
+    backgroundColor: "#333",
+  },
+  container: {
+    ...lightStyles.container,
+    borderStartColor: "#fff",
+    backgroundColor: "#555",
+  },
+  text: {
+    ...lightStyles.text,
+    color: "#fff",
+  },
+  nameText: {
+    ...lightStyles.nameText,
+    color: "#aaa",
+  },
+  studentCount: {
+    ...lightStyles.studentCount,
+    backgroundColor: "#777",
+  },
+  studentCountText: {
+    ...lightStyles.studentCountText,
+    color: "#fff",
   },
 });
