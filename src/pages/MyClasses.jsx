@@ -172,11 +172,6 @@ const MyClasses = () => {
                         <Text style={styles.nameText}>Code: {item.code}</Text>
                       </View>
                     </View>
-                    <View style={styles.studentCount}>
-                      <Text style={styles.studentCountText}>
-                        {item.students.length - 1}
-                      </Text>
-                    </View>
                   </View>
                 </TouchableOpacity>
               </Swipeable>
