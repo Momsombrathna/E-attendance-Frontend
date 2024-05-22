@@ -62,6 +62,15 @@ export default function EditMySubClass({ route }) {
     hideToPicker();
   };
 
+  const locationRanges = [
+    { label: "5x5m", value: 0.005 },
+    { label: "10x10m", value: 0.01 },
+    { label: "15x15m", value: 0.015 },
+    { label: "20x20m", value: 0.02 },
+    { label: "25x25m", value: 0.025 },
+    { label: "30x30m", value: 0.03 },
+  ];
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -176,12 +185,37 @@ export default function EditMySubClass({ route }) {
         </View>
 
         <Text style={styles.label}>Location Range</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Location Range"
-          value={location_range}
-          onChangeText={setLocationRange}
-        />
+        <View style={styles.rangPicker}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {locationRanges.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.rangeButton,
+                  {
+                    backgroundColor:
+                      location_range === String(item.value)
+                        ? "#2F3791"
+                        : "#eee",
+                  },
+                ]}
+                onPress={() => setLocationRange(String(item.value))}
+              >
+                <Text
+                  style={[
+                    styles.textInput,
+                    {
+                      color:
+                        location_range === String(item.value) ? "#fff" : "#000",
+                    },
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         <Text style={styles.label}>Location</Text>
         {isLoading ? (
@@ -212,7 +246,7 @@ export default function EditMySubClass({ route }) {
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>
-            {loading ? <ActivityIndicator color="#eee" /> : "Create"}
+            {loading ? <ActivityIndicator color="#eee" /> : "Update"}
           </Text>
         </TouchableOpacity>
         {error && (
@@ -239,7 +273,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   input: {
-    height: 50,
+    height: 40,
     backgroundColor: "#eee",
     borderRadius: 10,
     padding: 10,
@@ -276,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dateInput: {
-    height: 50,
+    height: 40,
     backgroundColor: "#eee",
     borderRadius: 10,
     padding: 10,
@@ -299,6 +333,19 @@ const styles = StyleSheet.create({
     color: "#2F3791",
     opacity: 0.9,
     paddingLeft: 5,
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  rangPicker: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  rangeButton: {
+    backgroundColor: "#eee",
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+  },
+  rangeText: {
+    color: "#000",
   },
 });

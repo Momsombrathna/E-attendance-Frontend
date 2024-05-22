@@ -11,20 +11,28 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
+import { Swipeable } from "react-native-gesture-handler";
 import { API_URL, useUserData } from "../../api/config";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { renderRightAction } from "../partials/Swapeable";
+import axios from "axios";
 
 export default function ViewMember({ route }) {
   const { classId, token } = route.params;
   const { userId } = useUserData();
   const [getClass, setGetClass] = useState({});
-  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
 
+  useFocusEffect(
+    React.useCallback(() => {
+      getClassData();
+    }, [classId])
+  );
+
   const getClassData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`${API_URL}/class/get-class/${classId}`, {
         method: "GET",
@@ -37,29 +45,133 @@ export default function ViewMember({ route }) {
       setLoading(false);
     } catch (error) {
       console.log(error);
+      setError(error);
       setLoading(false);
     } finally {
       setLoading(false);
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getClassData();
-    }, [classId])
-  );
+  async function handleRemove(classId, userId, studentId) {
+    try {
+      const response = await fetch(`${API_URL}/class/kick-student/${classId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": token,
+        },
+        body: JSON.stringify({
+          userId,
+          studentId,
+        }),
+      });
 
-  console.log(getClass.students);
+      if (response.ok) {
+        // filter the student out of the class
+        const newStudents = getClass.students.filter(
+          (student) => student.studentId !== studentId
+        );
+        setGetClass({ ...getClass, students: newStudents });
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", errorData.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Failed to remove student. Please try again later.");
+    }
+  }
+
+  const renderRightActions = (progress, studentId) => (
+    <View style={{ width: 190, flexDirection: "row" }}>
+      {renderRightAction(
+        "Edit",
+        "#2F3791",
+        192,
+        progress,
+        () => {
+          Alert.alert("Edit", "Are you sure you want to edit this user?");
+        },
+        "pencil"
+      )}
+      {renderRightAction(
+        "Remove",
+        "#FF453A",
+        128,
+        progress,
+        () => {
+          Alert.alert(
+            "Remove",
+            "Are you sure you want to remove this user from the classes?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "OK",
+                onPress: () => handleRemove(classId, userId, studentId),
+                style: "destructive",
+              },
+            ]
+          );
+        },
+        "trash"
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.main}>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#eee" />
+        </View>
       ) : (
         <FlatList
           data={getClass.students}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => <Text> {item}</Text>}
+          keyExtractor={(item) => item.studentId.toString()}
+          renderItem={({ item }) =>
+            item.studentId === userId ? (
+              <View style={styles.container}>
+                <View style={styles.content}>
+                  <Image
+                    source={{ uri: item.studentProfile }}
+                    style={styles.image}
+                  />
+                  <View style={styles.textView}>
+                    <Text style={styles.text}>{item.studentName}</Text>
+                  </View>
+                </View>
+                <View style={styles.textViews}>
+                  <Text style={styles.nameText}>Admin</Text>
+                </View>
+              </View>
+            ) : (
+              <Swipeable
+                renderRightActions={(progress) =>
+                  renderRightActions(progress, item.studentId)
+                }
+              >
+                <View style={styles.container}>
+                  <View style={styles.content}>
+                    <Image
+                      source={{ uri: item.studentProfile }}
+                      style={styles.image}
+                    />
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>{item.studentName}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.textViews}>
+                    <Text style={styles.nameText}>&nbsp;</Text>
+                  </View>
+                </View>
+              </Swipeable>
+            )
+          }
         />
       )}
     </View>
@@ -70,34 +182,38 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 5,
   },
   container: {
-    padding: 5,
+    height: 70,
+    flex: 1,
+    flexDirection: "row",
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#eee",
   },
   content: {
     flexDirection: "row",
     alignItems: "center",
-    height: 60,
   },
   image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+  },
+  textView: {
+    marginLeft: 10,
   },
   text: {
     fontSize: 18,
   },
   nameText: {
-    marginTop: 5,
     fontSize: 14,
-    color: "#666",
+    color: "#777",
   },
-  textView: {
+  textViews: {
+    flex: 1,
+    alignItems: "flex-end",
     justifyContent: "center",
-    flexDirection: "column",
+    marginRight: 10,
   },
 });

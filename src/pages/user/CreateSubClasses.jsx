@@ -8,10 +8,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
+  Checkbox,
+  ScrollView,
   Modal,
   Button,
   TextInput,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
@@ -23,7 +27,7 @@ export default function CreateSubClasses({ route }) {
   const { classId, token } = route.params;
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState();
   const [from, setFrom] = useState(new Date());
   const [to, setTo] = useState(new Date());
   const [location_range, setLocation_range] = useState("");
@@ -61,6 +65,15 @@ export default function CreateSubClasses({ route }) {
     setTo(datetime);
     hideToPicker();
   };
+
+  const locationRanges = [
+    { label: "5x5m", value: 0.005 },
+    { label: "10x10m", value: 0.01 },
+    { label: "15x15m", value: 0.015 },
+    { label: "20x20m", value: 0.02 },
+    { label: "25x25m", value: 0.025 },
+    { label: "30x30m", value: 0.03 },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -149,7 +162,10 @@ export default function CreateSubClasses({ route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={styles.form}>
         <Text style={styles.label}>Description</Text>
         <TextInput
@@ -197,12 +213,34 @@ export default function CreateSubClasses({ route }) {
         </View>
 
         <Text style={styles.label}>Location Range</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Location Range"
-          value={location_range}
-          onChangeText={setLocation_range}
-        />
+        <View style={styles.rangPicker}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {locationRanges.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.rangeButton,
+                  {
+                    backgroundColor:
+                      location_range === item.value ? "#2F3791" : "#eee",
+                  },
+                ]}
+                onPress={() => setLocation_range(item.value)}
+              >
+                <Text
+                  style={[
+                    styles.textInput,
+                    {
+                      color: location_range === item.value ? "#fff" : "#000",
+                    },
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         <Text style={styles.label}>Location</Text>
         {isLoading ? (
@@ -240,7 +278,7 @@ export default function CreateSubClasses({ route }) {
           <Text style={{ color: "red", paddingHorizontal: 10 }}>{error}</Text>
         )}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -260,7 +298,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   input: {
-    height: 50,
+    height: 40,
     backgroundColor: "#eee",
     borderRadius: 10,
     padding: 10,
@@ -297,7 +335,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dateInput: {
-    height: 50,
+    height: 40,
     backgroundColor: "#eee",
     borderRadius: 10,
     padding: 10,
@@ -320,6 +358,22 @@ const styles = StyleSheet.create({
     color: "#2F3791",
     opacity: 0.9,
     paddingLeft: 5,
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  rangPicker: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    marginBottom: 10,
+  },
+  rangeButton: {
+    height: 40,
+    backgroundColor: "#eee",
+    borderRadius: 10,
+    padding: 10,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 5,
   },
 });
