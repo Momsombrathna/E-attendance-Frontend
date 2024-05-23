@@ -419,7 +419,7 @@ export default function App() {
               component={showCodeComponent}
               options={{
                 headerShown: true,
-                title: "Code",
+                title: "Invite Code",
               }}
             />
           </Stack.Navigator>
