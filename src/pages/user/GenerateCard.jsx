@@ -1,5 +1,5 @@
 // Import necessary libaries
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useUserData, API_URL } from "../../api/config";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
+import { ThemeContext } from "../../hooks/ThemeContext";
 
 export default function GenerateCard() {
   const [loading, setLoading] = useState(false);
@@ -29,6 +30,60 @@ export default function GenerateCard() {
 
   const { userId, token } = useUserData();
   const navigation = useNavigation();
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      marginTop: 50,
+      flex: 1,
+      padding: 20,
+      backgroundColor: darkMode ? "#000" : "#fff",
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    headerText: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginLeft: 20,
+      color: darkMode ? "#fff" : "#000",
+    },
+    body: {
+      marginTop: 20,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: darkMode ? "#fff" : "gray",
+      padding: 10,
+      borderRadius: 5,
+      marginBottom: 10,
+      color: darkMode ? "#fff" : "#000",
+      backgroundColor: darkMode ? "#333" : "#fff",
+    },
+    error: {
+      color: "red",
+      marginTop: 10,
+    },
+    btn: {
+      marginTop: 20,
+      backgroundColor:  "#2F3791",
+      padding: 5,
+      borderRadius: 5,
+    },
+    button: {
+      backgroundColor: "#2F3791",
+      padding: 10,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: 5,
+    },
+    placeholderText: {
+      color: darkMode ? "#fff" : "gray",
+    },
+  });
 
   const handleGenerateCard = async () => {
     setLoading(true);
@@ -128,7 +183,7 @@ export default function GenerateCard() {
         <FontAwesome5
           name="arrow-left"
           size={24}
-          color="black"
+          color={darkMode ? "#fff" : "black"}
           onPress={() => navigation.goBack()}
         />
         <Text style={styles.headerText}>Generate Card</Text>
@@ -139,48 +194,56 @@ export default function GenerateCard() {
           value={firstName}
           onChangeText={setFirstName}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Last Name"
           value={lastName}
           onChangeText={setLastName}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="sex"
           value={sex}
           onChangeText={setSex}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Age"
           value={age}
           onChangeText={setAge}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Date of Birth"
           value={dateOfBirth}
           onChangeText={setDateOfBirth}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Address"
           value={address}
           onChangeText={setAddress}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Phone Number"
           value={phoneNumber}
           onChangeText={setPhoneNumber}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
         <TextInput
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
           style={styles.input}
+          placeholderTextColor={styles.placeholderText.color}
         />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -194,48 +257,3 @@ export default function GenerateCard() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 50,
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginLeft: 20,
-  },
-  body: {
-    marginTop: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  error: {
-    color: "red",
-    marginTop: 10,
-  },
-  btn: {
-    marginTop: 20,
-    backgroundColor: "#2F3791",
-    padding: 5,
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: "#2F3791",
-    padding: 10,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-  },
-});

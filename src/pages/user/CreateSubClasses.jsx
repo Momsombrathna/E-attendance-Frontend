@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { API_URL, useUserData } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
 } from "react-native";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import MapView, { Marker } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
 import axios from "axios";
@@ -39,6 +40,8 @@ export default function CreateSubClasses({ route }) {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { darkMode } = useContext(ThemeContext);
 
   const showFromPicker = () => {
     setFromPickerVisible(true);
@@ -161,6 +164,106 @@ export default function CreateSubClasses({ route }) {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: darkMode ? "#000" : "#fff",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginVertical: 20,
+      color: darkMode ? "#fff" : "#000",
+    },
+    form: {
+      marginHorizontal: 20,
+      marginTop: 20,
+    },
+    input: {
+      height: 40,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      color: darkMode ? "#fff" : "#000",
+    },
+    map: {
+      height: 300,
+      borderRadius: 10,
+      overflow: "hidden",
+      marginBottom: 10,
+    },
+    button: {
+      marginTop: 10,
+      backgroundColor: darkMode ? "#2F3791" : "#2F3791",
+      padding: 15,
+      marginBottom: 10,
+      borderRadius: 10,
+      height: 50,
+      alignItems: "center",
+    },
+    buttonText: {
+      color: darkMode ? "#fff" : "#fff",
+      fontWeight: "bold",
+    },
+    loadingView: {
+      height: 300,
+      borderRadius: 10,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    datePickContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    dateInput: {
+      height: 40,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      color: darkMode ? "#fff" : "#000",
+    },
+    textInput: {
+      color: darkMode ? "#fff" : "#000",
+    },
+    to: {
+      marginHorizontal: 10,
+      alignSelf: "center",
+      fontSize: 16,
+      color: darkMode ? "#fff" : "#000",
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: darkMode ? "#fff" : "#2F3791",
+      opacity: 0.9,
+      paddingLeft: 5,
+      marginBottom: 10,
+    },
+    rangPicker: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-around",
+      marginBottom: 10,
+    },
+    rangeButton: {
+      height: 40,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 10,
+      padding: 10,
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 5,
+    },
+  });
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -222,7 +325,11 @@ export default function CreateSubClasses({ route }) {
                   styles.rangeButton,
                   {
                     backgroundColor:
-                      location_range === item.value ? "#2F3791" : "#eee",
+                      location_range === item.value
+                        ? "#2F3791"
+                        : darkMode
+                        ? "#333"
+                        : "#eee",
                   },
                 ]}
                 onPress={() => setLocation_range(item.value)}
@@ -231,7 +338,12 @@ export default function CreateSubClasses({ route }) {
                   style={[
                     styles.textInput,
                     {
-                      color: location_range === item.value ? "#fff" : "#000",
+                      color:
+                        location_range === item.value
+                          ? "#fff"
+                          : darkMode
+                          ? "#fff"
+                          : "#000",
                     },
                   ]}
                 >
@@ -281,99 +393,3 @@ export default function CreateSubClasses({ route }) {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  form: {
-    marginHorizontal: 20,
-    marginTop: 20,
-  },
-  input: {
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  map: {
-    height: 300,
-    borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 10,
-  },
-  button: {
-    marginTop: 10,
-    backgroundColor: "#2F3791",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    height: 50,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  loadingView: {
-    height: 300,
-    borderRadius: 10,
-    backgroundColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  datePickContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dateInput: {
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  textInput: {
-    color: "#000",
-  },
-  to: {
-    marginHorizontal: 10,
-    alignSelf: "center",
-    fontSize: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#2F3791",
-    opacity: 0.9,
-    paddingLeft: 5,
-    marginBottom: 10,
-  },
-  rangPicker: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    marginBottom: 10,
-  },
-  rangeButton: {
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 5,
-  },
-});

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-
 import {
   Text,
   View,
@@ -8,7 +7,9 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
@@ -166,7 +167,7 @@ export default function Profile() {
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity onPress={handleLogout}>
-            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18 }}>
+            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18, color: darkMode ? "white" : "black" }}>
               Log Out
             </Text>
           </TouchableOpacity>
@@ -180,7 +181,7 @@ export default function Profile() {
             <Ionicons
               name="pencil-sharp"
               size={30}
-              color="black"
+              color={darkMode ? "white" : "black"}
               style={{ marginRight: 25 }}
             />
           </TouchableOpacity>
@@ -297,7 +298,7 @@ export default function Profile() {
                         }}
                       />
                       <TouchableOpacity
-                        style={{ position: "absolute", bottom: 150 }}
+                        style={{ position: "absolute", top: 50, right: 20 }}
                         onPress={() => handleDownload(card.qrCode)}
                       >
                         <Ionicons
@@ -308,7 +309,7 @@ export default function Profile() {
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        style={{ position: "absolute", top: 50, right: 20 }}
+                        style={{ position: "absolute", top: 53, left: 20 }}
                         onPress={() => setImageModalVisible(false)}
                       >
                         <Text style={{ color: "white", fontSize: 20 }}>

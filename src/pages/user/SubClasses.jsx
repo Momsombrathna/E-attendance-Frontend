@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   SafeAreaView,
   View,
@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { API_URL } from "../../api/config";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import Feather from "react-native-vector-icons/Feather";
@@ -27,6 +28,70 @@ export default function SubClasses({ route }) {
     latitude: 0,
     longitude: 0,
     location_range: 0,
+  });
+
+  //const { darkMode } = useContext(ThemeContext);
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 5,
+      backgroundColor: darkMode ? "#000" : "#fff",
+    },
+    subClass: {
+      padding: 10,
+      margin: 5,
+      borderStartColor: darkMode ? "#fff" : "#2F3791",
+      borderStartWidth: 5,
+      borderRadius: 10,
+      backgroundColor: darkMode ? "#333" : "#FFFFFF",
+      shadowColor: darkMode ? "#fff" : "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    subClassName: {
+      width: "80%",
+      height: "auto",
+      marginBottom: 5,
+      fontSize: 18,
+      maxWidth: "80%",
+      fontWeight: "bold",
+      color: darkMode ? "#fff" : "#000",
+    },
+    time: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+      marginBottom: 5,
+      marginRight: 5,
+      padding: 5,
+      borderRadius: 5,
+      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+    },
+    locationRange: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+      marginBottom: 5,
+      marginRight: 5,
+      padding: 5,
+      borderRadius: 5,
+      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+    },
+    map: {
+      width: "100%",
+      height: "90%",
+    },
+    body: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
   });
 
   const getSubClass = async () => {
@@ -58,7 +123,7 @@ export default function SubClasses({ route }) {
     }, [classId])
   );
 
-  console.log(subClass);
+  //console.log(subClass);
 
   return (
     <View style={styles.container}>
@@ -176,62 +241,3 @@ export default function SubClasses({ route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 5,
-    backgroundColor: "#fff",
-  },
-  subClass: {
-    padding: 10,
-    margin: 5,
-    borderStartColor: "#2F3791",
-    borderStartWidth: 5,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  subClassName: {
-    width: "80%",
-    height: "auto",
-    marginBottom: 5,
-    fontSize: 18,
-    maxWidth: "80%",
-    fontWeight: "bold",
-  },
-  time: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 5,
-    marginRight: 5,
-    padding: 5,
-    borderRadius: 5,
-    backgroundColor: "#f2f2f2",
-  },
-  locationRange: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 5,
-    marginRight: 5,
-    padding: 5,
-    borderRadius: 5,
-    backgroundColor: "#f2f2f2",
-  },
-  map: {
-    width: "100%",
-    height: "90%",
-  },
-  body: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-});
