@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { API_URL, useUserData } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -14,6 +14,7 @@ import {
   Animated,
 } from "react-native";
 import * as Location from "expo-location";
+import { ThemeContext } from "../../hooks/ThemeContext";
 
 export default function ViewSubClasses({ route }) {
   const { subClassId, subClassName } = route.params;
@@ -25,6 +26,57 @@ export default function ViewSubClasses({ route }) {
   const navigation = useNavigation();
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [scaleValue] = useState(new Animated.Value(0));
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      height: "100%",
+      backgroundColor: darkMode ? "#000" : "#fff",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    viewsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      gap: 10,
+    },
+    checkedInButton: {
+      backgroundColor: "#FF6347", // Tomato color or black
+      padding: 10,
+      borderRadius: 5,
+      elevation: 3, // for Android
+      shadowColor: "#000", // for iOS
+      shadowOffset: { width: 0, height: 2 }, // for iOS
+      shadowOpacity: 0.25, // for iOS
+      shadowRadius: 3.84, // for iOS
+    },
+    buttonText: {
+      color: "#FFF",
+      fontSize: 16,
+      textAlign: "center",
+    },
+    checkedOutButton: {
+      backgroundColor: "green", // Tomato color or black
+      padding: 10,
+      borderRadius: 5,
+      elevation: 3, // for Android
+      shadowColor: "#000", // for iOS
+      shadowOffset: { width: 0, height: 2 }, // for iOS
+      shadowOpacity: 0.25, // for iOS
+      shadowRadius: 3.84, // for iOS
+    },
+    className: {
+      fontSize: 20,
+      fontWeight: "bold",
+    },
+    error: {
+      color: "red",
+    },
+    errorShown: {
+      marginBottom: 10,
+    },
+  });
 
   // get latitude and longitude from device automatically
   const getLocation = async () => {
@@ -163,53 +215,3 @@ export default function ViewSubClasses({ route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: "100%",
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  viewsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    gap: 10,
-  },
-  checkedInButton: {
-    backgroundColor: "#FF6347", // Tomato color
-    padding: 10,
-    borderRadius: 5,
-    elevation: 3, // for Android
-    shadowColor: "#000", // for iOS
-    shadowOffset: { width: 0, height: 2 }, // for iOS
-    shadowOpacity: 0.25, // for iOS
-    shadowRadius: 3.84, // for iOS
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  checkedOutButton: {
-    backgroundColor: "green", // Tomato color
-    padding: 10,
-    borderRadius: 5,
-    elevation: 3, // for Android
-    shadowColor: "#000", // for iOS
-    shadowOffset: { width: 0, height: 2 }, // for iOS
-    shadowOpacity: 0.25, // for iOS
-    shadowRadius: 3.84, // for iOS
-  },
-  className: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  error: {
-    color: "red",
-  },
-  errorShown: {
-    marginBottom: 10,
-  },
-});

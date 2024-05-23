@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { API_URL, useUserData } from "../../api/config";
 import {
   View,
@@ -12,7 +12,8 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import axios from "axios";
+import { ThemeContext } from "../../hooks/ThemeContext";
 
 export default function JoinClass() {
   const { userId, token } = useUserData();
@@ -20,6 +21,51 @@ export default function JoinClass() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      backgroundColor: darkMode ? "black" : "white",
+    },
+    inputContainer: {
+      width: "100%",
+      marginBottom: 10,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 5,
+    },
+    input: {
+      fontSize: 16,
+      padding: 10,
+      height: 50,
+      color: darkMode ? "white" : "black",
+    },
+    button: {
+      width: "100%",
+      padding: 15,
+      backgroundColor: darkMode ? "#2F3791" : "#007AFF",
+      borderRadius: 5,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    buttonText: {
+      color: "white",
+      fontSize: 16,
+    },
+    error: {
+      color: "red",
+      marginTop: 10,
+    },
+    inputError: {
+      borderColor: "red",
+      borderWidth: 1,
+      borderRadius: 5,
+    },
+  });
 
   const joinClass = async () => {
     setLoading(true);
@@ -61,7 +107,7 @@ export default function JoinClass() {
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      style={{ flex: 1, backgroundColor: "white" }}
+      style={{ flex: 1, backgroundColor: darkMode ? "black" : "white" }}
     >
       <ScrollView>
         <View style={styles.container}>
@@ -71,6 +117,7 @@ export default function JoinClass() {
               style={[styles.input, error && styles.inputError]}
               value={code}
               onChangeText={(text) => setCode(text)}
+              placeholderTextColor={darkMode ? "white" : "black"}
               placeholder="Enter Invite Code"
             />
           </View>
@@ -86,44 +133,3 @@ export default function JoinClass() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  inputContainer: {
-    width: "100%",
-    marginBottom: 10,
-    backgroundColor: "#eee",
-    borderRadius: 5,
-  },
-  input: {
-    fontSize: 16,
-    padding: 10,
-    height: 50,
-  },
-  button: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#2F3791",
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  error: {
-    color: "red",
-    marginTop: 10,
-  },
-  inputError: {
-    borderColor: "red",
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-});

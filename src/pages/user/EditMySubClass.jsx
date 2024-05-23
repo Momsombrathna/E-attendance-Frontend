@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Button,
   Platform,
 } from "react-native";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import MapView, { Marker } from "react-native-maps";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as Location from "expo-location";
@@ -35,6 +36,7 @@ export default function EditMySubClass({ route }) {
   const [longitude, setLongitude] = useState(lon);
   const [isLoading, setIsLoading] = useState(true);
   const [region, setRegion] = useState(null);
+  const { darkMode } = useContext(ThemeContext);
 
   const showFromPicker = () => {
     setFromPickerVisible(true);
@@ -136,6 +138,103 @@ export default function EditMySubClass({ route }) {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: darkMode ? "#555" : "#fff",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginVertical: 20,
+      color: darkMode ? "#fff" : "#000",
+    },
+    form: {
+      marginHorizontal: 20,
+      marginTop: 20,
+    },
+    input: {
+      height: 40,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      color: darkMode ? "#fff" : "#000",
+    },
+    map: {
+      height: 300,
+      borderRadius: 10,
+      overflow: "hidden",
+      marginBottom: 10,
+    },
+    button: {
+      marginTop: 10,
+      backgroundColor: darkMode ? "#2F3791" : "#2F3791",
+      padding: 15,
+      marginBottom: 10,
+      borderRadius: 10,
+      height: 50,
+      alignItems: "center",
+    },
+    buttonText: {
+      color: "#fff",
+      fontWeight: "bold",
+    },
+    loadingView: {
+      height: 300,
+      borderRadius: 10,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    datePickContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    dateInput: {
+      height: 40,
+      backgroundColor: darkMode ? "#333" : "#eee",
+      borderRadius: 10,
+      padding: 10,
+      marginBottom: 10,
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      color: darkMode ? "#fff" : "#000",
+    },
+    textInput: {
+      color: darkMode ? "#fff" : "#000",
+    },
+    to: {
+      marginHorizontal: 10,
+      alignSelf: "center",
+      fontSize: 16,
+      color: darkMode ? "#fff" : "#000",
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: darkMode ? "#0000FF" : "#2F3791",
+      opacity: 0.9,
+      paddingLeft: 5,
+      marginBottom: 10,
+    },
+    rangPicker: {
+      flexDirection: "row",
+      marginBottom: 10,
+    },
+    rangeButton: {
+      backgroundColor: darkMode ? "#333" : "#eee",
+      padding: 10,
+      borderRadius: 10,
+      marginHorizontal: 5,
+    },
+    rangeText: {
+      color: darkMode ? "#fff" : "#000",
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.form}>
@@ -196,6 +295,8 @@ export default function EditMySubClass({ route }) {
                     backgroundColor:
                       location_range === String(item.value)
                         ? "#2F3791"
+                        : darkMode
+                        ? "#333"
                         : "#eee",
                   },
                 ]}
@@ -206,7 +307,7 @@ export default function EditMySubClass({ route }) {
                     styles.textInput,
                     {
                       color:
-                        location_range === String(item.value) ? "#fff" : "#000",
+                        location_range === String(item.value) ? "#fff" : darkMode ? "#fff" : "#000",
                     },
                   ]}
                 >
@@ -256,96 +357,3 @@ export default function EditMySubClass({ route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  form: {
-    marginHorizontal: 20,
-    marginTop: 20,
-  },
-  input: {
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  map: {
-    height: 300,
-    borderRadius: 10,
-    overflow: "hidden",
-    marginBottom: 10,
-  },
-  button: {
-    marginTop: 10,
-    backgroundColor: "#2F3791",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    height: 50,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  loadingView: {
-    height: 300,
-    borderRadius: 10,
-    backgroundColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  datePickContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dateInput: {
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  textInput: {
-    color: "#000",
-  },
-  to: {
-    marginHorizontal: 10,
-    alignSelf: "center",
-    fontSize: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#2F3791",
-    opacity: 0.9,
-    paddingLeft: 5,
-    marginBottom: 10,
-  },
-  rangPicker: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  rangeButton: {
-    backgroundColor: "#eee",
-    padding: 10,
-    borderRadius: 10,
-    marginHorizontal: 5,
-  },
-  rangeText: {
-    color: "#000",
-  },
-});

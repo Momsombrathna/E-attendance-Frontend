@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
@@ -23,6 +24,8 @@ export default function ViewMember({ route }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
+
+  const { darkMode } = useContext(ThemeContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -121,6 +124,47 @@ export default function ViewMember({ route }) {
     </View>
   );
 
+  const styles = StyleSheet.create({
+    main: {
+      flex: 1,
+      backgroundColor: darkMode ? "#000" : "#fff",
+    },
+    container: {
+      height: 70,
+      flex: 1,
+      flexDirection: "row",
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: darkMode ? "#555" : "#eee",
+    },
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    image: {
+      width: 50,
+      height: 50,
+      borderRadius: 50,
+    },
+    textView: {
+      marginLeft: 10,
+    },
+    text: {
+      fontSize: 18,
+      color: darkMode ? "#fff" : "#000",
+    },
+    nameText: {
+      fontSize: 14,
+      color: darkMode ? "#999" : "#777",
+    },
+    textViews: {
+      flex: 1,
+      alignItems: "flex-end",
+      justifyContent: "center",
+      marginRight: 10,
+    },
+  });
+
   return (
     <View style={styles.main}>
       {loading ? (
@@ -177,43 +221,3 @@ export default function ViewMember({ route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  container: {
-    height: 70,
-    flex: 1,
-    flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  image: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-  },
-  textView: {
-    marginLeft: 10,
-  },
-  text: {
-    fontSize: 18,
-  },
-  nameText: {
-    fontSize: 14,
-    color: "#777",
-  },
-  textViews: {
-    flex: 1,
-    alignItems: "flex-end",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-});

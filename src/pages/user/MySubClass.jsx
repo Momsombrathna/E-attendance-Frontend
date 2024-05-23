@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,6 +11,7 @@ import {
   Button,
   ActivityIndicator,
 } from "react-native";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import { API_URL, useUserData } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
@@ -31,6 +32,103 @@ export default function MySubClasses({ route }) {
     latitude: 0,
     longitude: 0,
     location_range: 0,
+  });
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: darkMode ? "#000" : "#fff",
+      paddingHorizontal: 5,
+    },
+    subClass: {
+      padding: 10,
+      margin: 5,
+      borderStartColor: darkMode ? "#fff" : "#2F3791",
+      borderStartWidth: 5,
+      borderRadius: 10,
+      backgroundColor: darkMode ? "#333" : "#FFFFFF",
+      shadowColor: darkMode ? "#fff" : "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    subClassName: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: darkMode ? "#fff" : "#000",
+    },
+    name: {
+      maxWidth: 100,
+      marginBottom: 5,
+    },
+    time: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+      marginRight: 5,
+      padding: 5,
+      borderRadius: 5,
+      backgroundColor: darkMode ? "#222" : "#f2f2f2",
+    },
+    locationRange: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+      marginRight: 5,
+      padding: 5,
+      borderRadius: 5,
+      backgroundColor: darkMode ? "#222" : "#f2f2f2",
+    },
+    map: {
+      width: "100%",
+      height: "90%",
+    },
+    body: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    date: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+    },
+    dateRange: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#666",
+    },
+    checkedInCount: {
+      fontSize: 14,
+      padding: 5,
+      color: "#fff",
+    },
+    checkedOutCount: {
+      fontSize: 14,
+      color: "#fff",
+      padding: 5,
+    },
+
+    checkedInCountContainer: {
+      backgroundColor: "green",
+      maxWidth: 100,
+      opacity: 0.8,
+      marginTop: 5,
+      marginRight: 5,
+      padding: 3,
+      borderRadius: 5,
+    },
+    checkedOutCountContainer: {
+      backgroundColor: "red",
+      maxWidth: 100,
+      opacity: 0.8,
+      marginTop: 5,
+      marginRight: 5,
+      padding: 3,
+      borderRadius: 5,
+    },
   });
 
   const getSubClass = async () => {
@@ -304,97 +402,3 @@ export default function MySubClasses({ route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 5,
-  },
-  subClass: {
-    padding: 10,
-    margin: 5,
-    borderStartColor: "#2F3791",
-    borderStartWidth: 5,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  subClassName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  name: {
-    maxWidth: 100,
-    marginBottom: 5,
-  },
-  time: {
-    fontSize: 14,
-    color: "#666",
-    marginRight: 5,
-    padding: 5,
-    borderRadius: 5,
-    backgroundColor: "#f2f2f2",
-  },
-  locationRange: {
-    fontSize: 14,
-    color: "#666",
-    marginRight: 5,
-    padding: 5,
-    borderRadius: 5,
-    backgroundColor: "#f2f2f2",
-  },
-  map: {
-    width: "100%",
-    height: "90%",
-  },
-  body: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  date: {
-    fontSize: 14,
-    color: "#666",
-  },
-  dateRange: {
-    fontSize: 14,
-    color: "#666",
-  },
-  checkedInCount: {
-    fontSize: 14,
-    padding: 5,
-    color: "#fff",
-  },
-  checkedOutCount: {
-    fontSize: 14,
-    color: "#fff",
-    padding: 5,
-  },
-
-  checkedInCountContainer: {
-    backgroundColor: "green",
-    maxWidth: 100,
-    opacity: 0.8,
-    marginTop: 5,
-    marginRight: 5,
-    padding: 3,
-    borderRadius: 5,
-  },
-  checkedOutCountContainer: {
-    backgroundColor: "red",
-    maxWidth: 100,
-    opacity: 0.8,
-    marginTop: 5,
-    marginRight: 5,
-    padding: 3,
-    borderRadius: 5,
-  },
-});

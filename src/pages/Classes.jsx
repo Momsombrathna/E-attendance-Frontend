@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,17 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
+import { ThemeContext } from "../hooks/ThemeContext";
 
 const Classes = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [classData, setClass] = useState({});
   const { token, userId } = useUserData();
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = darkMode ? darkStyles : lightStyles;
 
   const getClassData = async () => {
     setLoading(true);
@@ -98,7 +103,7 @@ const Classes = () => {
 
 export default Classes;
 
-const styles = StyleSheet.create({
+const lightStyles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: "#fff",
@@ -143,5 +148,26 @@ const styles = StyleSheet.create({
   textView: {
     justifyContent: "center",
     flexDirection: "column",
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  ...lightStyles,
+  main: {
+    ...lightStyles.main,
+    backgroundColor: "#333",
+  },
+  container: {
+    ...lightStyles.container,
+    borderStartColor: "#fffa",
+    backgroundColor: "#555",
+  },
+  text: {
+    ...lightStyles.text,
+    color: "#fff",
+  },
+  nameText: {
+    ...lightStyles.nameText,
+    color: "#ccc",
   },
 });
