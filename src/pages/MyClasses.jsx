@@ -153,6 +153,7 @@ const MyClasses = () => {
                       token: token,
                       code: item.code,
                       className: item.className,
+                      classProfile: item.classProfile,
                     })
                   }
                 >

@@ -163,7 +163,7 @@ function TabNavigator() {
   );
 }
 
-const HeaderRight = ({ classId, token, code }) => {
+const HeaderRight = ({ classId, token, code, classProfile, className }) => {
   const navigation = useNavigation();
   const { darkMode } = useContext(ThemeContext);
 
@@ -191,6 +191,8 @@ const HeaderRight = ({ classId, token, code }) => {
             code,
             classId,
             token,
+            classProfile,
+            className,
           })
         }
       >
@@ -293,6 +295,8 @@ export default function App() {
                     classId={route.params.classId}
                     token={route.params.token}
                     code={route.params.code}
+                    classProfile={route.params.classProfile}
+                    className={route.params.className}
                   />
                 ),
                 headerTitle: () => (

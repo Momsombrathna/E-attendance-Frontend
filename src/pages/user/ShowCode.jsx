@@ -16,7 +16,7 @@ import * as FileSystem from "expo-file-system";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function ShowCode({ route }) {
-  const { code, classId, token } = route.params;
+  const { code, classId, token, classProfile, className } = route.params;
   const [codeData, setCodeData] = useState(code.toString());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
