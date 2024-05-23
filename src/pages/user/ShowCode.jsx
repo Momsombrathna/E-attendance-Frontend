@@ -64,65 +64,58 @@ export default function ShowCode({ route }) {
   return (
     <View style={styles.main}>
       <View style={styles.container}>
-        {loading ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color="#eee" />
-          </View>
-        ) : (
-          <>
-            <ViewShot
-              ref={viewShotRef}
+        <ViewShot
+          ref={viewShotRef}
+          style={{
+            padding: 10,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          options={{ format: "jpg", quality: 1.0 }}
+        >
+          <Text style={styles.text}>Scan the QR code to join the class</Text>
+          {loading ? (
+            <View
               style={{
-                padding: 10,
-                justifyContent: "center",
+                width: 200,
+                height: 200,
+                marginTop: 10,
+                marginBottom: 10,
                 alignItems: "center",
+                justifyContent: "center",
               }}
-              options={{ format: "jpg", quality: 1.0 }}
             >
-              <Text style={styles.text}>
-                Scan the QR code to join the class
-              </Text>
-
-              <View style={styles.qrCodeContainer}>
-                <Image
-                  source={{ uri: textToQrCode() }}
-                  style={{
-                    width: 200,
-                    height: 200,
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                />
-              </View>
-
-              <View style={styles.codeContainer}>
-                <Text style={styles.text}>Or enter this code: </Text>
-                <View style={styles.codeText}>
-                  <Text style={{ color: "#fff", fontSize: 18 }}>
-                    {codeData}
-                  </Text>
-                </View>
-              </View>
-            </ViewShot>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.icon} onPress={handleRefreshCode}>
-                <Icon name="refresh" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.icon}
-                onPress={captureAndSaveImage}
-              >
-                <Icon name="download" size={24} color="#fff" />
-              </TouchableOpacity>
+              <ActivityIndicator size="large" color="#2F3791" />
             </View>
-          </>
-        )}
+          ) : (
+            <View style={styles.qrCodeContainer}>
+              <Image
+                source={{ uri: textToQrCode() }}
+                style={{
+                  width: 200,
+                  height: 200,
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              />
+            </View>
+          )}
+
+          <View style={styles.codeContainer}>
+            <Text style={styles.text}>Or enter this code: </Text>
+            <View style={styles.codeText}>
+              <Text style={{ color: "#fff", fontSize: 18 }}>{codeData}</Text>
+            </View>
+          </View>
+        </ViewShot>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.icon} onPress={handleRefreshCode}>
+            <Icon name="refresh" size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.icon} onPress={captureAndSaveImage}>
+            <Icon name="download" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
         {error ? (
           <Text style={{ color: "red", fontSize: 16, marginTop: 10 }}>

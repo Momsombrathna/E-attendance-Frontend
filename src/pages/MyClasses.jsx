@@ -152,6 +152,7 @@ const MyClasses = () => {
                       classId: item._id,
                       token: token,
                       code: item.code,
+                      className: item.className,
                     })
                   }
                 >
@@ -268,7 +269,6 @@ export default MyClasses;
 //     fontSize: 12,
 //   },
 // });
-
 
 const lightStyles = StyleSheet.create({
   main: {
