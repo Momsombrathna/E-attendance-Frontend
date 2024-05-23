@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Text,
-  Alert,
-  TextStyle,
   View,
-  Button,
+  Modal,
   StyleSheet,
   Image,
   TouchableOpacity,
-  ToastAndroid,
-  TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from "expo-image-picker";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ThemeContext } from "../hooks/ThemeContext";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import moment from "moment";
 
 import LoadingScreen from "./LoadingScreen";
 
@@ -27,6 +28,11 @@ export default function Profile() {
   const [user, setUser] = useState({});
   const [card, setCard] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isImageModalVisible, setImageModalVisible] = useState(false);
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = darkMode ? darkStyles : lightStyles;
 
   useEffect(() => {
     getUserData();
@@ -122,6 +128,38 @@ export default function Profile() {
       .padStart(6, "0");
   };
 
+  const handleDownload = async (uri) => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert("Please allow permissions to download");
+      return;
+    }
+
+    let date = moment().format("YYYYMMDDhhmmss");
+    let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
+
+    try {
+      const res = await FileSystem.downloadAsync(uri, fileUri);
+      saveFile(res.uri);
+      alert("File saved successfully");
+    } catch (err) {
+      console.log("FS Err: ", err);
+    }
+  };
+  const saveFile = async (fileUri) => {
+    try {
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
+      const album = await MediaLibrary.getAlbumAsync("Download");
+      if (album == null) {
+        await MediaLibrary.createAlbumAsync("Download", asset, false);
+      } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      }
+    } catch (err) {
+      console.log("Save err: ", err);
+    }
+  };
+
   // console.log(token);
 
   React.useLayoutEffect(() => {
@@ -129,7 +167,7 @@ export default function Profile() {
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity onPress={handleLogout}>
-            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18 }}>
+            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18, color: darkMode ? "white" : "black" }}>
               Log Out
             </Text>
           </TouchableOpacity>
@@ -143,7 +181,7 @@ export default function Profile() {
             <Ionicons
               name="pencil-sharp"
               size={30}
-              color="black"
+              color={darkMode ? "white" : "black"}
               style={{ marginRight: 25 }}
             />
           </TouchableOpacity>
@@ -160,76 +198,135 @@ export default function Profile() {
         <ScrollView style={styles.container}>
           <View style={{ alignItems: "center" }}>
             <Image style={styles.image} source={{ uri: user.profile }} />
-            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+            <Text style={styles.userName}>
               {card.lastName} {card.firstName}
             </Text>
-            <Text style={{ fontWeight: "300", fontSize: 14, color: "#7E7E7E" }}>
-              {user.email}
-            </Text>
+            <Text style={styles.userEmail}>{user.email}</Text>
             <LinearGradient
               style={[styles.card]}
-              colors={["#2F3791", "#8089EB"]}
+              colors={darkMode ? ["#333", "#555"] : ["#2F3791", "#8089EB"]}
               start={{ x: 0, y: 0.7 }}
               end={{ x: 0.3, y: 0 }}
             >
               <View
                 style={[
-                  styles.rowItem,
-                  { justifyContent: "space-between", alignItems: "flex-start" },
+                  styles.container,
+                  {
+                    backgroundColor: "transparent",
+                    justifyContent: "space-between",
+                  },
                 ]}
               >
-                <Text style={styles.header}>Student ID Card</Text>
-                <View style={{ alignItems: "flex-end" }}>
-                  <Text
-                    style={[
-                      styles.text,
-                      {
-                        fontSize: 12,
-                        backgroundColor: user.verified ? "green" : "red",
-                        padding: 5,
-                        borderRadius: 5,
-                      },
-                    ]}
+                <View
+                  style={[
+                    styles.rowItem,
+                    {
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    },
+                  ]}
+                >
+                  <Image
+                    style={[styles.qrCode, { width: 80, height: 80 }]}
+                    source={{ uri: card.profile }}
+                  />
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text
+                      style={[
+                        styles.text,
+                        {
+                          fontSize: 12,
+                          backgroundColor: user.verified ? "green" : "red",
+                          padding: 5,
+                          borderRadius: 5,
+                        },
+                      ]}
+                    >
+                      {user.verified ? "Verified" : "Not Verified"}
+                    </Text>
+                    <Text style={styles.text}>
+                      Student ID: {hashUserId(card.userId)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={[styles.rowItem, { alignItems: "center" }]}>
+                  <View style={{ alignItems: "flex-start" }}>
+                    <Text style={styles.text}>
+                      <Text style={{ fontWeight: "bold" }}>Name: </Text>{" "}
+                      {card.lastName} {card.firstName}
+                    </Text>
+                    <Text style={styles.text}>
+                      <Text style={{ fontWeight: "bold" }}>Date of Birth:</Text>{" "}
+                      {new Date(card.dateOfBirth).toLocaleDateString()}
+                    </Text>
+                    <Text style={styles.text}>
+                      <Text style={{ fontWeight: "bold" }}>Gender: </Text>{" "}
+                      {card.sex}
+                    </Text>
+                    <Text style={styles.text}>
+                      <Text style={{ fontWeight: "bold" }}>Address: </Text>{" "}
+                      {card.address}
+                    </Text>
+                    <Text style={styles.text}>
+                      <Text style={{ fontWeight: "bold" }}>Phone: </Text>{" "}
+                      {card.phoneNumber}
+                    </Text>
+                  </View>
+                  <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={isImageModalVisible}
+                    onRequestClose={() => {
+                      setImageModalVisible(!isImageModalVisible);
+                    }}
                   >
-                    {user.verified ? "Verified" : "Not Verified"}
-                  </Text>
-                  <Text style={styles.text}>
-                    Student ID: {hashUserId(card.userId)}
-                  </Text>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "black",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        source={{ uri: card.qrCode }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          resizeMode: "contain",
+                        }}
+                      />
+                      <TouchableOpacity
+                        style={{ position: "absolute", top: 50, right: 20 }}
+                        onPress={() => handleDownload(card.qrCode)}
+                      >
+                        <Ionicons
+                          name="download-outline"
+                          color={"white"}
+                          size={24}
+                        />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={{ position: "absolute", top: 53, left: 20 }}
+                        onPress={() => setImageModalVisible(false)}
+                      >
+                        <Text style={{ color: "white", fontSize: 20 }}>
+                          Close
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </Modal>
+                  <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+                    <Image
+                      style={styles.qrCode}
+                      source={{ uri: card.qrCode }}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
-              <View
-                style={[styles.rowItem, { justifyContent: "space-between" }]}
-              >
-                <Text style={styles.text}>
-                  <Text style={{ fontWeight: "bold" }}>Name: </Text>{" "}
-                  {card.lastName} {card.firstName}
-                </Text>
-              </View>
-              <Text style={styles.text}>
-                <Text style={{ fontWeight: "bold" }}>Date of Birth:</Text>{" "}
-                {new Date(card.dateOfBirth).toLocaleDateString()}
-              </Text>
-              <Text style={styles.text}>
-                <Text style={{ fontWeight: "bold" }}>Gender: </Text> Gender:{" "}
-                {card.sex}
-              </Text>
-              <Text style={styles.text}>
-                <Text style={{ fontWeight: "bold" }}>Address: </Text>{" "}
-                {card.address}
-              </Text>
             </LinearGradient>
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 25,
-                marginBottom: 25,
-              }}
-            >
-              <Image style={styles.qrCode} source={{ uri: card.qrCode }} />
-            </View>
           </View>
         </ScrollView>
       )}
@@ -237,7 +334,7 @@ export default function Profile() {
   );
 }
 
-const styles = StyleSheet.create({
+const lightStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -252,6 +349,15 @@ const styles = StyleSheet.create({
     marginTop: 25,
     marginBottom: 5,
   },
+  userName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "black",
+  },
+  userEmail: {
+    fontSize: 14,
+    color: "#919191",
+  },
   header: {
     fontSize: 18,
     fontWeight: "bold",
@@ -263,7 +369,6 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 10,
-    flexDirection: "column",
     width: "90%",
     height: 200,
     borderRadius: 5,
@@ -277,20 +382,44 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
     elevation: 4,
-    justifyContent: "space-between",
-    alignItems: "flex-start",
   },
   rowItem: {
     flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    width: "100%",
+    justifyContent: "space-between",
   },
   qrCode: {
-    width: 320,
-    height: 320,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     borderColor: "black",
     borderWidth: 1,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  ...lightStyles,
+  container: {
+    ...lightStyles.container,
+    backgroundColor: "#333",
+  },
+  image: {
+    ...lightStyles.image,
+    borderColor: "white",
+  },
+  userName: {
+    ...lightStyles.userName,
+    color: "white",
+  },
+  userEmail: {
+    ...lightStyles.userEmail,
+    color: "#919191",
+  },
+  card: {
+    ...lightStyles.card,
+    backgroundColor: "#555",
+  },
+  qrCode: {
+    ...lightStyles.qrCode,
+    borderColor: "white",
   },
 });

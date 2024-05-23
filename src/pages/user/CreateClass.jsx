@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { API_URL, useUserData } from "../../api/config";
 import {
   View,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { ThemeContext } from "../../hooks/ThemeContext";
 
 export default function CreateClass() {
   const { token, userId } = useUserData();
@@ -21,6 +22,65 @@ export default function CreateClass() {
   const [className, setClassName] = useState("");
 
   const navigation = useNavigation();
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      marginTop: 10,
+      flex: 1,
+      backgroundColor: darkMode ? "black" : "white",
+      padding: 20,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    headerText: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginLeft: 10,
+      color: darkMode ? "white" : "black",
+    },
+    form: {
+      flex: 1,
+      height: 100,
+    },
+    text: {
+      fontSize: 16,
+      marginBottom: 10,
+      color: darkMode ? "white" : "black",
+    },
+    input: {
+      backgroundColor: darkMode ? "#333" : "#eee",
+      height: 50,
+      padding: 10,
+      marginBottom: 20,
+      borderRadius: 5,
+      color: darkMode ? "white" : "black",
+    },
+    button: {
+      backgroundColor: darkMode ? "#2F3791" : "#007AFF",
+      padding: 15,
+      alignItems: "center",
+      borderRadius: 5,
+    },
+    buttonText: {
+      color: "white",
+      fontWeight: "bold",
+    },
+    error: {
+      marginTop: 10,
+      paddingHorizontal: 10,
+      color: "red",
+      fontSize: 16,
+    },
+    errorInput: {
+      borderColor: "red",
+      borderWidth: 1,
+    },
+  });
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -70,7 +130,7 @@ export default function CreateClass() {
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      style={{ flex: 1, backgroundColor: "white" }}
+      style={{ flex: 1, backgroundColor: darkMode ? "black" : "white" }}
     >
       <ScrollView>
         <View style={styles.container}>
@@ -78,6 +138,7 @@ export default function CreateClass() {
             <TextInput
               style={[styles.input, error && styles.errorInput]}
               value={className}
+              placeholderTextColor={darkMode ? "white" : "black"}
               placeholder="Enter class name"
               onChangeText={setClassName}
             />
@@ -93,57 +154,3 @@ export default function CreateClass() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 10,
-    flex: 1,
-    backgroundColor: "white",
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  form: {
-    flex: 1,
-    height: 100,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  input: {
-    backgroundColor: "#eee",
-    height: 50,
-    padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: "#2F3791",
-    padding: 15,
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  error: {
-    marginTop: 10,
-    paddingHorizontal: 10,
-    color: "red",
-    fontSize: 16,
-  },
-  errorInput: {
-    borderColor: "red",
-    borderWidth: 1,
-  },
-});

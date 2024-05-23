@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "e-attendance",
-    "slug": "e-attendance",
+    "name": "E-attendance",
+    "slug": "e-attendance-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -25,17 +23,15 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "ACCESS_FINE_LOCATION"
-      ],
-      "package": "com.brathna.eattendancefrontend"
+      "permissions": ["ACCESS_FINE_LOCATION"],
+      "package": "com.vic_07.eattendancefrontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "35198498-d007-41f2-98ab-fa83c3987f91"
+        "projectId": "2552f97f-b7d9-42e8-b51b-32e394f5680f"
       }
     }
   }

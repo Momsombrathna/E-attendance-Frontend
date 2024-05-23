@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useContext} from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   View,
@@ -10,6 +10,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
+import { ThemeContext } from "../../hooks/ThemeContext";
 import { API_URL, useUserData } from "../../api/config";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -24,6 +25,50 @@ export default function UpdateClass({ route }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: darkMode ? "#555" : "#FFFFFF",
+      height: "100%",
+    },
+    content: {
+      flexDirection: "column",
+      justifyContent: "center",
+      padding: 10,
+
+      alignItems: "center",
+    },
+    header: {
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    text: {
+      marginTop: 10,
+      fontSize: 18,
+      color: darkMode ? "#FFFFFF" : "#000000",
+      opacity: 0.7,
+      fontWeight: "bold",
+    },
+    image: {
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+    },
+    form: {
+      marginTop: 20,
+      width: "90%",
+    },
+    textInput: {
+      backgroundColor: "#eee",
+      height: 50,
+      padding: 10,
+      marginBottom: 20,
+      borderRadius: 5,
+    },
+  });
 
   const pickImage = async () => {
     setLoading(true);
@@ -190,44 +235,4 @@ export default function UpdateClass({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#FFFFFF",
-    height: "100%",
-  },
-  content: {
-    flexDirection: "column",
-    justifyContent: "center",
-    padding: 10,
 
-    alignItems: "center",
-  },
-  header: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    marginTop: 10,
-    fontSize: 18,
-    color: "#000",
-    opacity: 0.7,
-    fontWeight: "bold",
-  },
-  image: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-  },
-  form: {
-    marginTop: 20,
-    width: "90%",
-  },
-  textInput: {
-    backgroundColor: "#eee",
-    height: 50,
-    padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
-  },
-});

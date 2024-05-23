@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
+import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
+
 import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TouchableOpacity, Text, View } from "react-native";
@@ -33,11 +36,21 @@ import MySubClasses from "./src/pages/user/MySubClass";
 import EditMySubClass from "./src/pages/user/EditMySubClass";
 import CheckMember from "./src/pages/user/CheckMember";
 
-const Stack = createStackNavigator();
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
   const navigation = useNavigation();
+  const { darkMode } = useContext(ThemeContext);
+
+  const tabBarBackgroundColor = darkMode ? "#333" : "#fff";
+  const tabBarActiveColor = darkMode ? "#fff" : "#2F3791";
+  const tabBarInactiveColor = darkMode ? "#888" : "gray";
+  const headerBackgroundColor = darkMode ? "#333" : "#fff";
+  const headerTintColor = darkMode ? "#fff" : "#000";
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -67,28 +80,34 @@ function TabNavigator() {
                 style={{
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
-                  backgroundColor: focused ? "#2F3791" : "#fff",
+                  backgroundColor: focused
+                    ? tabBarActiveColor
+                    : tabBarBackgroundColor,
                   height: 2,
                   width: 70,
                 }}
               />
-
               <Icon name={iconName} size={size} color={color} />
             </View>
           );
         },
-        tabBarActiveTintColor: "#2F3791",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: tabBarActiveColor,
+        tabBarInactiveTintColor: tabBarInactiveColor,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#fff",
+          backgroundColor: tabBarBackgroundColor,
         },
+        headerStyle: {
+          backgroundColor: headerBackgroundColor,
+        },
+        headerTintColor: headerTintColor,
       })}
     >
       <Tab.Screen
         name="MyClasses"
         component={MyClasses}
         options={{
+          tabBarVisible: false,
           title: "My Classes",
           headerRight: () => (
             <TouchableOpacity
@@ -107,7 +126,7 @@ function TabNavigator() {
                 name="plus"
                 size={20}
                 style={{
-                  color: "#2F3791",
+                  color: tabBarActiveColor,
                   opacity: 0.9,
                 }}
               />
@@ -137,7 +156,6 @@ function TabNavigator() {
           ),
         }}
       />
-
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
@@ -146,6 +164,9 @@ function TabNavigator() {
 
 const HeaderRight = ({ classId, token }) => {
   const navigation = useNavigation();
+  const { darkMode } = useContext(ThemeContext);
+
+  const buttonColor = darkMode ? "#fff" : "#2F3791";
 
   return (
     <TouchableOpacity
@@ -166,7 +187,7 @@ const HeaderRight = ({ classId, token }) => {
         name="plus"
         size={20}
         style={{
-          color: "#2F3791",
+          color: buttonColor,
           opacity: 0.9,
         }}
       />
@@ -189,45 +210,55 @@ export default function App() {
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => !prevMode);
   };
+
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen
-            name="Home"
-            component={ProtectedComponent}
-            options={{ title: " Back" }}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+        <NavigationContainer>
+          <StatusBar
+            barStyle={darkMode ? "light-content" : "dark-content"}
+            backgroundColor={darkMode ? "#333" : "#fff"}
           />
-
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Register" component={Register} />
-          <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
-          <Stack.Screen name="ForgotPass" component={ForgotPass} />
-          <Stack.Screen
-            name="VerifyEmailResetPass"
-            component={VerifyEmailResetPass}
-          />
-          <Stack.Screen name="SetNewPass" component={SetNewPass} />
-          <Stack.Screen name="Classes" component={Classes} />
-
-          <Stack.Screen
-            name="MySubClass"
-            component={MySubClasses}
-            options={({ route, navigation }) => ({
-              headerShown: true,
-              title: route.params.className,
-              headerRight: () => (
-                <HeaderRight
-                  classId={route.params.classId}
-                  token={route.params.token}
-                />
-              ),
-              headerTitle: () => {
-                return (
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              headerStyle: {
+                backgroundColor: darkMode ? "#333" : "#fff",
+              },
+              headerTintColor: darkMode ? "#fff" : "#000",
+              contentStyle: {
+                backgroundColor: darkMode ? "#333" : "#fff",
+              },
+            }}
+          >
+            <Stack.Screen
+              name="Home"
+              component={ProtectedComponent}
+              options={{ title: " Back" }}
+            />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
+            <Stack.Screen name="ForgotPass" component={ForgotPass} />
+            <Stack.Screen
+              name="VerifyEmailResetPass"
+              component={VerifyEmailResetPass}
+            />
+            <Stack.Screen name="SetNewPass" component={SetNewPass} />
+            <Stack.Screen name="Classes" component={Classes} />
+            <Stack.Screen
+              name="MySubClass"
+              component={MySubClasses}
+              options={({ route, navigation }) => ({
+                headerShown: true,
+                title: route.params.className,
+                headerRight: () => (
+                  <HeaderRight
+                    classId={route.params.classId}
+                    token={route.params.token}
+                  />
+                ),
+                headerTitle: () => (
                   <TouchableOpacity
                     onPress={() =>
                       navigation.navigate("viewMembers", {
@@ -236,109 +267,119 @@ export default function App() {
                       })
                     }
                   >
-                    <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    <Text
+                      style={{
+                        fontWeight: "600",
+                        fontSize: 16,
+                        color: darkMode ? "#fff" : "#000",
+                      }}
+                    >
                       {route.params.className}
                     </Text>
                   </TouchableOpacity>
-                );
-              },
-              title: "Back",
-            })}
-          />
-          <Stack.Screen
-            name="SubClass"
-            component={SubClasses}
-            options={({ route, navigation }) => ({
-              headerShown: true,
-              title: route.params.className,
-              headerTitle: () => {
-                return (
+                ),
+                title: "Back",
+              })}
+            />
+            <Stack.Screen
+              name="SubClass"
+              component={SubClasses}
+              options={({ route, navigation }) => ({
+                headerShown: true,
+                title: route.params.className,
+                headerTitle: () => (
                   <TouchableOpacity
                     onPress={() => navigation.navigate("viewMembers")}
                   >
-                    <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                    <Text
+                      style={{
+                        fontWeight: "600",
+                        fontSize: 16,
+                        color: darkMode ? "#fff" : "#000",
+                      }}
+                    >
                       {route.params.className}
                     </Text>
                   </TouchableOpacity>
-                );
-              },
-              title: "Back",
-            })}
-          />
-          <Stack.Screen
-            name="viewMembers"
-            component={ViewMember}
-            options={{ headerShown: true, title: "Members" }}
-          />
-          <Stack.Screen
-            name="cameraSelfie"
-            component={CameraSelfie}
-            options={{ headerShown: true, title: "Take a selfie" }}
-          />
-          <Stack.Screen
-            name="GenerateCard"
-            component={GenerateCardComponent}
-            options={{ title: "My Card" }}
-          />
-          <Stack.Screen
-            name="CreateClass"
-            component={CreateClassComponent}
-            options={{
-              title: " Create Class",
-              headerShown: true,
-            }}
-          />
-          <Stack.Screen
-            name="JoinClass"
-            component={JoinClass}
-            options={{
-              title: " Join Class",
-              headerShown: true,
-            }}
-          />
-          <Stack.Screen
-            name="UpdateClass"
-            component={UpdateClassComponent}
-            options={{
-              headerShown: true,
-              title: "Update Class",
-            }}
-          />
-          <Stack.Screen
-            name="CreateSubClasses"
-            component={CreateSubClassesComponent}
-            options={{
-              headerShown: true,
-              title: "Create Subclass",
-            }}
-            headerRight={() => <HeaderRight />}
-          />
-          <Stack.Screen
-            name="ViewSubClasses"
-            component={ViewSubClassesComponent}
-            options={{
-              headerShown: true,
-              title: "View Subclass",
-            }}
-          />
-          <Stack.Screen
-            name="EditMySubClass"
-            component={EditMySubClassComponent}
-            options={{
-              headerShown: true,
-              title: "Edit Subclass",
-            }}
-          />
-          <Stack.Screen
-            name="CheckMember"
-            component={CheckMemberComponent}
-            options={{
-              headerShown: true,
-              title: "Attendance",
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ThemeContext.Provider>
+                ),
+                title: "Back",
+              })}
+            />
+            <Stack.Screen
+              name="viewMembers"
+              component={ViewMember}
+              options={{ headerShown: true, title: "Members" }}
+            />
+            <Stack.Screen
+              name="cameraSelfie"
+              component={CameraSelfie}
+              options={{ headerShown: true, title: "Take a selfie" }}
+            />
+            <Stack.Screen
+              name="GenerateCard"
+              component={GenerateCardComponent}
+              options={{ title: "My Card" }}
+            />
+            <Stack.Screen
+              name="CreateClass"
+              component={CreateClassComponent}
+              options={{
+                title: " Create Class",
+                headerShown: true,
+              }}
+            />
+            <Stack.Screen
+              name="JoinClass"
+              component={JoinClass}
+              options={{
+                title: " Join Class",
+                headerShown: true,
+              }}
+            />
+            <Stack.Screen
+              name="UpdateClass"
+              component={UpdateClassComponent}
+              options={{
+                headerShown: true,
+                title: "Update Class",
+              }}
+            />
+            <Stack.Screen
+              name="CreateSubClasses"
+              component={CreateSubClassesComponent}
+              options={{
+                headerShown: true,
+                title: "Create Subclass",
+              }}
+              headerRight={() => <HeaderRight />}
+            />
+            <Stack.Screen
+              name="ViewSubClasses"
+              component={ViewSubClassesComponent}
+              options={{
+                headerShown: true,
+                title: "View Subclass",
+              }}
+            />
+            <Stack.Screen
+              name="EditMySubClass"
+              component={EditMySubClassComponent}
+              options={{
+                headerShown: true,
+                title: "Edit Subclass",
+              }}
+            />
+            <Stack.Screen
+              name="CheckMember"
+              component={CheckMemberComponent}
+              options={{
+                headerShown: true,
+                title: "Attendance",
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ThemeContext.Provider>
+    </GestureHandlerRootView>
   );
 }
