@@ -14,6 +14,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { ThemeContext } from "../../hooks/ThemeContext";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function JoinClass() {
   const { userId, token } = useUserData();
@@ -45,9 +46,10 @@ export default function JoinClass() {
       color: darkMode ? "white" : "black",
     },
     button: {
+      marginTop: 10,
       width: "100%",
       padding: 15,
-      backgroundColor: darkMode ? "#2F3791" : "#007AFF",
+      backgroundColor: "#2F3791",
       borderRadius: 5,
       justifyContent: "center",
       alignItems: "center",
@@ -120,6 +122,21 @@ export default function JoinClass() {
               placeholderTextColor={darkMode ? "white" : "black"}
               placeholder="Enter Invite Code"
             />
+            {/* Qr code scanner */}
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 10,
+              }}
+              onPress={() => navigation.navigate("Scanner")}
+            >
+              <MaterialCommunityIcons
+                name="qrcode-scan"
+                size={30}
+                color="#2F3791"
+              />
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity style={styles.button} onPress={joinClass}>

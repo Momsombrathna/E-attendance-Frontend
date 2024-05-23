@@ -36,6 +36,7 @@ import MySubClasses from "./src/pages/user/MySubClass";
 import EditMySubClass from "./src/pages/user/EditMySubClass";
 import CheckMember from "./src/pages/user/CheckMember";
 import ShowCode from "./src/pages/user/ShowCode";
+import QrCodeScannerJoinClass from "./src/pages/user/QrCodeScannerJoinClass";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -241,6 +242,9 @@ const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
 const EditMySubClassComponent = withAuthProtection(EditMySubClass);
 const CheckMemberComponent = withAuthProtection(CheckMember);
 const showCodeComponent = withAuthProtection(ShowCode);
+const QrCodeScannerJoinClassComponent = withAuthProtection(
+  QrCodeScannerJoinClass
+);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -424,6 +428,14 @@ export default function App() {
               options={{
                 headerShown: true,
                 title: "Invite Code",
+              }}
+            />
+            <Stack.Screen
+              name="Scanner"
+              component={QrCodeScannerJoinClassComponent}
+              options={{
+                headerShown: true,
+                title: "Scan Code",
               }}
             />
           </Stack.Navigator>
