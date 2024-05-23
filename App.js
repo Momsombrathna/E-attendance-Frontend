@@ -35,6 +35,7 @@ import ViewMember from "./src/pages/user/ViewMember";
 import MySubClasses from "./src/pages/user/MySubClass";
 import EditMySubClass from "./src/pages/user/EditMySubClass";
 import CheckMember from "./src/pages/user/CheckMember";
+import ShowCode from "./src/pages/user/ShowCode";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -162,36 +163,70 @@ function TabNavigator() {
   );
 }
 
-const HeaderRight = ({ classId, token }) => {
+const HeaderRight = ({ classId, token, code }) => {
   const navigation = useNavigation();
   const { darkMode } = useContext(ThemeContext);
 
   const buttonColor = darkMode ? "#fff" : "#2F3791";
 
   return (
-    <TouchableOpacity
+    <View
       style={{
-        marginRight: 20,
-        padding: 5,
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+        flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
       }}
-      onPress={() =>
-        navigation.navigate("CreateSubClasses", { classId, token })
-      }
     >
-      <FontAwesome5
-        name="plus"
-        size={20}
+      <TouchableOpacity
         style={{
-          color: buttonColor,
-          opacity: 0.9,
+          marginRight: 10,
+          padding: 5,
+          width: 30,
+          height: 30,
+          borderRadius: 15,
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
-    </TouchableOpacity>
+        onPress={() =>
+          navigation.navigate("ShowCode", {
+            code,
+            classId,
+            token,
+          })
+        }
+      >
+        <MaterialCommunityIcons
+          name="qrcode"
+          size={20}
+          style={{
+            color: "#2F3791",
+            opacity: 0.9,
+          }}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          marginRight: 20,
+          padding: 5,
+          width: 30,
+          height: 30,
+          borderRadius: 15,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onPress={() =>
+          navigation.navigate("CreateSubClasses", { classId, token })
+        }
+      >
+        <FontAwesome5
+          name="plus"
+          size={20}
+          style={{
+            color: "#2F3791",
+            opacity: 0.9,
+          }}
+        />
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -203,6 +238,7 @@ const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
 const ViewSubClassesComponent = withAuthProtection(ViewSubClasses);
 const EditMySubClassComponent = withAuthProtection(EditMySubClass);
 const CheckMemberComponent = withAuthProtection(CheckMember);
+const showCodeComponent = withAuthProtection(ShowCode);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -256,6 +292,7 @@ export default function App() {
                   <HeaderRight
                     classId={route.params.classId}
                     token={route.params.token}
+                    code={route.params.code}
                   />
                 ),
                 headerTitle: () => (
@@ -375,6 +412,14 @@ export default function App() {
               options={{
                 headerShown: true,
                 title: "Attendance",
+              }}
+            />
+            <Stack.Screen
+              name="ShowCode"
+              component={showCodeComponent}
+              options={{
+                headerShown: true,
+                title: "Invite Code",
               }}
             />
           </Stack.Navigator>

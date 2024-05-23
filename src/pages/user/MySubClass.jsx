@@ -22,7 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 
 export default function MySubClasses({ route }) {
-  const { classId, token } = route.params;
+  const { classId, token, code } = route.params;
   const { userId } = useUserData();
   const [subClass, setSubClass] = useState({});
   const [loading, setLoading] = useState(false);
