@@ -200,7 +200,7 @@ const HeaderRight = ({ classId, token, code, classProfile, className }) => {
           name="qrcode"
           size={20}
           style={{
-            color: "#2F3791",
+            color: darkMode ? "#fff" : "#2F3791",
             opacity: 0.9,
           }}
         />
@@ -223,7 +223,7 @@ const HeaderRight = ({ classId, token, code, classProfile, className }) => {
           name="plus"
           size={20}
           style={{
-            color: "#2F3791",
+            color: darkMode ? "#fff" : "#2F3791",
             opacity: 0.9,
           }}
         />
