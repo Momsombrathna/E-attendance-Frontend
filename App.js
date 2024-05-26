@@ -40,6 +40,7 @@ import QrCodeScannerJoinClass from "./src/pages/user/QrCodeScannerJoinClass";
 import ViewSubclassesMember from "./src/pages/user/ViewSubclassesMember";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import TeacherScanner from "./src/pages/user/TeacherScanner";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -246,6 +247,7 @@ const showCodeComponent = withAuthProtection(ShowCode);
 const QrCodeScannerJoinClassComponent = withAuthProtection(
   QrCodeScannerJoinClass
 );
+const TeacherScannerComponent = withAuthProtection(TeacherScanner);
 const ViewSubclassesMemberComponent = withAuthProtection(ViewSubclassesMember);
 
 export default function App() {
@@ -440,6 +442,14 @@ export default function App() {
             <Stack.Screen
               name="Scanner"
               component={QrCodeScannerJoinClassComponent}
+              options={{
+                headerShown: true,
+                title: "Scan Code",
+              }}
+            />
+            <Stack.Screen
+              name="TeacherScanner"
+              component={TeacherScannerComponent}
               options={{
                 headerShown: true,
                 title: "Scan Code",

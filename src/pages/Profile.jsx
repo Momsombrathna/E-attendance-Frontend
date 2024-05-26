@@ -19,7 +19,8 @@ import { ThemeContext } from "../hooks/ThemeContext";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import moment from "moment";
-
+import QRCode from "react-native-qrcode-svg";
+import ViewShot from "react-native-view-shot";
 import LoadingScreen from "./LoadingScreen";
 
 export default function Profile() {
@@ -29,6 +30,7 @@ export default function Profile() {
   const [card, setCard] = useState({});
   const [loading, setLoading] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
+  const qrCodeRef = React.useRef();
 
   const { darkMode } = useContext(ThemeContext);
 
@@ -128,37 +130,63 @@ export default function Profile() {
       .padStart(6, "0");
   };
 
-  const handleDownload = async (uri) => {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== "granted") {
-      alert("Please allow permissions to download");
-      return;
-    }
-
-    let date = moment().format("YYYYMMDDhhmmss");
-    let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
-
+  const captureAndSaveImage = async () => {
     try {
-      const res = await FileSystem.downloadAsync(uri, fileUri);
-      saveFile(res.uri);
-      alert("File saved successfully");
-    } catch (err) {
-      console.log("FS Err: ", err);
+      const uri = await qrCodeRef.current.capture();
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert("Success", "Image saved to device!");
+    } catch (error) {
+      console.error("Error saving image to device:", error);
+      Alert.alert("Error", "Failed to save image to device");
     }
   };
-  const saveFile = async (fileUri) => {
-    try {
-      const asset = await MediaLibrary.createAssetAsync(fileUri);
-      const album = await MediaLibrary.getAlbumAsync("Download");
-      if (album == null) {
-        await MediaLibrary.createAlbumAsync("Download", asset, false);
-      } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-      }
-    } catch (err) {
-      console.log("Save err: ", err);
-    }
-  };
+
+  // const handleDownload = async () => {
+  //   try {
+  //     const uri = await captureRef(qrCodeRef, {
+  //       format: "png",
+  //       quality: 0.8,
+  //     });
+
+  //     const asset = await MediaLibrary.createAssetAsync(uri);
+  //     await MediaLibrary.createAlbumAsync("Download", asset, false);
+  //     alert("Image saved to gallery");
+  //   } catch (error) {
+  //     console.error("Failed to save QR code", error);
+  //   }
+  // };
+
+  // const handleDownload = async (uri) => {
+  //   const { status } = await MediaLibrary.requestPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Please allow permissions to download");
+  //     return;
+  //   }
+
+  //   let date = moment().format("YYYYMMDDhhmmss");
+  //   let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
+
+  //   try {
+  //     const res = await FileSystem.downloadAsync(uri, fileUri);
+  //     saveFile(res.uri);
+  //     alert("File saved successfully");
+  //   } catch (err) {
+  //     console.log("FS Err: ", err);
+  //   }
+  // };
+  // const saveFile = async (fileUri) => {
+  //   try {
+  //     const asset = await MediaLibrary.createAssetAsync(fileUri);
+  //     const album = await MediaLibrary.getAlbumAsync("Download");
+  //     if (album == null) {
+  //       await MediaLibrary.createAlbumAsync("Download", asset, false);
+  //     } else {
+  //       await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+  //     }
+  //   } catch (err) {
+  //     console.log("Save err: ", err);
+  //   }
+  // };
 
   // console.log(token);
 
@@ -167,7 +195,14 @@ export default function Profile() {
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity onPress={handleLogout}>
-            <Text style={{ marginRight: 25, fontWeight: "600", fontSize: 18, color: darkMode ? "white" : "black" }}>
+            <Text
+              style={{
+                marginRight: 25,
+                fontWeight: "600",
+                fontSize: 18,
+                color: darkMode ? "#fff" : "#000",
+              }}
+            >
               Log Out
             </Text>
           </TouchableOpacity>
@@ -181,7 +216,7 @@ export default function Profile() {
             <Ionicons
               name="pencil-sharp"
               size={30}
-              color={darkMode ? "white" : "black"}
+              color={darkMode ? "#fff" : "#000"}
               style={{ marginRight: 25 }}
             />
           </TouchableOpacity>
@@ -289,17 +324,30 @@ export default function Profile() {
                         alignItems: "center",
                       }}
                     >
-                      <Image
+                      {/* <Image
                         source={{ uri: card.qrCode }}
                         style={{
                           width: "100%",
                           height: "100%",
                           resizeMode: "contain",
                         }}
-                      />
+                      /> */}
+                      <ViewShot
+                        ref={qrCodeRef}
+                        style={{ padding: 10, backgroundColor: "#fff" }}
+                      >
+                        <QRCode
+                          value={card.userId}
+                          size={300}
+                          backgroundColor="#fff"
+                          color="#000"
+                          padding={10}
+                          logo={{ uri: card.profile }}
+                        />
+                      </ViewShot>
                       <TouchableOpacity
                         style={{ position: "absolute", top: 50, right: 20 }}
-                        onPress={() => handleDownload(card.qrCode)}
+                        onPress={() => captureAndSaveImage()}
                       >
                         <Ionicons
                           name="download-outline"
@@ -319,10 +367,13 @@ export default function Profile() {
                     </View>
                   </Modal>
                   <TouchableOpacity onPress={() => setImageModalVisible(true)}>
-                    <Image
+                    <View style={styles.qrCodeContainer}>
+                      <QRCode value={card.userId} />
+                    </View>
+                    {/* <Image
                       style={styles.qrCode}
                       source={{ uri: card.qrCode }}
-                    />
+                    /> */}
                   </TouchableOpacity>
                 </View>
               </View>

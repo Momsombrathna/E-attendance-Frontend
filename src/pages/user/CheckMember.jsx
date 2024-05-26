@@ -1,10 +1,20 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { ThemeContext } from "../../hooks/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CheckMember({ route }) {
   const { item } = route.params;
   const { darkMode } = useContext(ThemeContext);
+  const navigation = useNavigation();
 
   const styles = StyleSheet.create({
     main: {
@@ -48,6 +58,25 @@ export default function CheckMember({ route }) {
       fontWeight: "bold",
     },
   });
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("TeacherScanner", { item })}
+          >
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={30}
+              color="#2F3791"
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.main}>
       <FlatList
