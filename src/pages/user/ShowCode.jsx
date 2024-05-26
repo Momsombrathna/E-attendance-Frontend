@@ -100,7 +100,7 @@ export default function ShowCode({ route }) {
                 color="#2F3791"
                 backgroundColor="#FFFFFF"
                 logo={{ uri: classProfile }}
-                logoSize={40}
+                logoSize={30}
                 logoBorderRadius={10}
                 logoBackgroundColor="white"
               />

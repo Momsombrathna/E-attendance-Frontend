@@ -134,7 +134,7 @@ export default function JoinClass() {
               <MaterialCommunityIcons
                 name="qrcode-scan"
                 size={30}
-                color="#2F3791"
+                color={darkMode ? "white" : "#2F3791"}
               />
             </TouchableOpacity>
           </View>
