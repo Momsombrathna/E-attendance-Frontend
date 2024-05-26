@@ -61,7 +61,7 @@ export default function CreateClass() {
       color: darkMode ? "white" : "black",
     },
     button: {
-      backgroundColor: darkMode ? "#2F3791" : "#007AFF",
+      backgroundColor: "#2F3791",
       padding: 15,
       alignItems: "center",
       borderRadius: 5,

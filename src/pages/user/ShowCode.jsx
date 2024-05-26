@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import ViewShot from "react-native-view-shot";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { ThemeContext } from "../../hooks/ThemeContext";
+import QRCode from "react-native-qrcode-svg";
 
 export default function ShowCode({ route }) {
   const { code, classId, token, classProfile, className } = route.params;
@@ -21,6 +23,9 @@ export default function ShowCode({ route }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const viewShotRef = useRef();
+  const { darkMode } = useContext(ThemeContext);
+
+  const styles = darkMode ? darkStyles : lightStyles;
 
   const handleRefreshCode = async () => {
     setLoading(true);
@@ -43,12 +48,12 @@ export default function ShowCode({ route }) {
     }
   };
 
-  const textToQrCode = () => {
-    const size = 200;
-    const text = codeData;
-    const qrCode = `https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=${size}x${size}&bgcolor=ffffff&color=000000`;
-    return qrCode;
-  };
+  // const textToQrCode = () => {
+  //   const size = 200;
+  //   const text = codeData;
+  //   const qrCode = `https://api.qrserver.com/v1/create-qr-code/?data=${text}&size=${size}x${size}&bgcolor=ffffff&color=000000`;
+  //   return qrCode;
+  // };
 
   const captureAndSaveImage = async () => {
     try {
@@ -89,14 +94,15 @@ export default function ShowCode({ route }) {
             </View>
           ) : (
             <View style={styles.qrCodeContainer}>
-              <Image
-                source={{ uri: textToQrCode() }}
-                style={{
-                  width: 200,
-                  height: 200,
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}
+              <QRCode
+                value={codeData}
+                size={200}
+                color="#2F3791"
+                backgroundColor="#FFFFFF"
+                logo={{ uri: classProfile }}
+                logoSize={30}
+                logoBorderRadius={10}
+                logoBackgroundColor="white"
               />
             </View>
           )}
@@ -127,7 +133,7 @@ export default function ShowCode({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const lightStyles = StyleSheet.create({
   main: {
     flex: 1,
     alignItems: "center",
@@ -163,6 +169,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+    marginBottom: 10,
+    marginTop: 10,
   },
   codeContainer: {
     marginTop: 10,
@@ -187,5 +195,43 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#2F3791",
     borderRadius: 5,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  main: {
+    ...lightStyles.main,
+    backgroundColor: "#333",
+  },
+  container: {
+    ...lightStyles.container,
+  },
+  text: {
+    ...lightStyles.text,
+    color: "#fff",
+  },
+  classText: {
+    ...lightStyles.classText,
+    color: "#fff",
+  },
+  codeText: {
+    ...lightStyles.codeText,
+    backgroundColor: "#555",
+  },
+  qrCodeContainer: {
+    ...lightStyles.qrCodeContainer,
+    backgroundColor: "#333",
+  },
+  codeContainer: {
+    ...lightStyles.codeContainer,
+  },
+  classContainer: {
+    ...lightStyles.classContainer,
+  },
+  buttonContainer: {
+    ...lightStyles.buttonContainer,
+  },
+  icon: {
+    ...lightStyles.icon,
   },
 });
