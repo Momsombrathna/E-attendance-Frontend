@@ -200,7 +200,7 @@ export default function Profile() {
                 marginRight: 25,
                 fontWeight: "600",
                 fontSize: 18,
-                color: darkMode ? "white" : "black",
+                color: darkMode ? "#fff" : "#000",
               }}
             >
               Log Out
@@ -216,7 +216,7 @@ export default function Profile() {
             <Ionicons
               name="pencil-sharp"
               size={30}
-              color={darkMode ? "white" : "black"}
+              color={darkMode ? "#fff" : "#000"}
               style={{ marginRight: 25 }}
             />
           </TouchableOpacity>

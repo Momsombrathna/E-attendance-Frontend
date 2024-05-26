@@ -127,15 +127,19 @@ export default function ViewMember({ route }) {
   const styles = StyleSheet.create({
     main: {
       flex: 1,
-      backgroundColor: darkMode ? "#000" : "#fff",
+      backgroundColor: darkMode ? "#333" : "#fff",
     },
     container: {
-      height: 70,
+      height: 60,
       flex: 1,
       flexDirection: "row",
       padding: 10,
       borderBottomWidth: 1,
       borderBottomColor: darkMode ? "#555" : "#eee",
+      backgroundColor: darkMode ? "#333" : "#eee",
+      margin: 2,
+      marginHorizontal: 5,
+      borderRadius: 5,
     },
     content: {
       flexDirection: "row",
@@ -163,6 +167,10 @@ export default function ViewMember({ route }) {
       justifyContent: "center",
       marginRight: 10,
     },
+    joinedDate: {
+      fontSize: 12,
+      color: darkMode ? "#999" : "#777",
+    },
   });
 
   return (
@@ -171,7 +179,7 @@ export default function ViewMember({ route }) {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color="#eee" />
+          <ActivityIndicator size="large" color="#2F3791" />
         </View>
       ) : (
         <FlatList
@@ -186,7 +194,26 @@ export default function ViewMember({ route }) {
                     style={styles.image}
                   />
                   <View style={styles.textView}>
-                    <Text style={styles.text}>{item.studentName}</Text>
+                    <Text style={styles.text}>
+                      {item.studentName}{" "}
+                      <Text
+                        style={{
+                          color: "green",
+                          fontSize: 18,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        &#10003;
+                      </Text>
+                    </Text>
+                    <Text style={styles.joinedDate}>
+                      Joined at:{" "}
+                      {new Date(item.joined).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.textViews}>
@@ -207,6 +234,14 @@ export default function ViewMember({ route }) {
                     />
                     <View style={styles.textView}>
                       <Text style={styles.text}>{item.studentName}</Text>
+                      <Text style={styles.joinedDate}>
+                        Joined at:{" "}
+                        {new Date(item.joined).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "2-digit",
+                          year: "numeric",
+                        })}
+                      </Text>
                     </View>
                   </View>
                   <View style={styles.textViews}>

@@ -7,11 +7,14 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 import { ThemeContext } from "../hooks/ThemeContext";
+import { renderRightAction } from "./partials/Swapeable";
+import { Swipeable } from "react-native-gesture-handler";
 
 const Classes = () => {
   const navigation = useNavigation();
@@ -52,6 +55,79 @@ const Classes = () => {
     }, [userId])
   );
 
+  const renderRightActions = (progress, classId) => (
+    <View style={{ width: 190, flexDirection: "row" }}>
+      {renderRightAction(
+        "Mute",
+        "#FF9500",
+        192,
+        progress,
+        () => {
+          Alert.alert("Mute", "Are you sure you want to mute this class?", [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              style: "destructive",
+            },
+          ]);
+        },
+        "volume-off"
+      )}
+      {renderRightAction(
+        "Leave",
+        "#FF453A",
+        128,
+        progress,
+        () => {
+          Alert.alert("Leave", "Are you sure you want to leave this class?", [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: () => handleLeave(classId),
+              style: "destructive",
+            },
+          ]);
+        },
+        "sign-out"
+      )}
+    </View>
+  );
+
+  const handleLeave = async (classId) => {
+    try {
+      const response = await fetch(`${API_URL}/class/leave-class/${classId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": token,
+        },
+        body: JSON.stringify({
+          userId: userId,
+        }),
+      });
+
+      if (response.ok) {
+        // filter the class out of the list
+        const newClasses = classData.filter(
+          (classItem) => classItem._id !== classId
+        );
+        setClass(newClasses);
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", errorData.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Failed to remove student. Please try again later.");
+    }
+  };
+
   return (
     <View style={styles.main}>
       {loading ? (
@@ -66,33 +142,43 @@ const Classes = () => {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <View style={{ margin: -2 }}>
-              <TouchableOpacity
-                style={styles.container}
-                onPress={() =>
-                  navigation.navigate("SubClass", {
-                    classId: item._id,
-                    token: token,
-                    className: item.className,
-                  })
+              <Swipeable
+                friction={2}
+                leftThreshold={1}
+                renderRightActions={(progress) =>
+                  renderRightActions(progress, item._id)
                 }
               >
-                <View style={styles.content}>
-                  <Image
-                    source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                    style={styles.image}
-                  />
-                  <View style={styles.textView}>
-                    <Text
-                      style={styles.text}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {item.className}
-                    </Text>
-                    <Text style={styles.nameText}>Owner: {item.ownerName}</Text>
+                <TouchableOpacity
+                  style={styles.container}
+                  onPress={() =>
+                    navigation.navigate("SubClass", {
+                      classId: item._id,
+                      token: token,
+                      className: item.className,
+                    })
+                  }
+                >
+                  <View style={styles.content}>
+                    <Image
+                      source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                      style={styles.image}
+                    />
+                    <View style={styles.textView}>
+                      <Text
+                        style={styles.text}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.className}
+                      </Text>
+                      <Text style={styles.nameText}>
+                        Owner: {item.ownerName}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </Swipeable>
             </View>
           )}
         />

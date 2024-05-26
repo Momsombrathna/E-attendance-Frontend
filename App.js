@@ -37,6 +37,7 @@ import EditMySubClass from "./src/pages/user/EditMySubClass";
 import CheckMember from "./src/pages/user/CheckMember";
 import ShowCode from "./src/pages/user/ShowCode";
 import QrCodeScannerJoinClass from "./src/pages/user/QrCodeScannerJoinClass";
+import ViewSubclassesMember from "./src/pages/user/ViewSubclassesMember";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import TeacherScanner from "./src/pages/user/TeacherScanner";
@@ -247,6 +248,7 @@ const QrCodeScannerJoinClassComponent = withAuthProtection(
   QrCodeScannerJoinClass
 );
 const TeacherScannerComponent = withAuthProtection(TeacherScanner);
+const ViewSubclassesMemberComponent = withAuthProtection(ViewSubclassesMember);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -336,7 +338,12 @@ export default function App() {
                 title: route.params.className,
                 headerTitle: () => (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("viewMembers")}
+                    onPress={() =>
+                      navigation.navigate("ViewSubclassesMember", {
+                        classId: route.params.classId,
+                        token: route.params.token,
+                      })
+                    }
                   >
                     <Text
                       style={{
@@ -446,6 +453,14 @@ export default function App() {
               options={{
                 headerShown: true,
                 title: "Scan Code",
+              }}
+            />
+            <Stack.Screen
+              name="ViewSubclassesMember"
+              component={ViewSubclassesMemberComponent}
+              options={{
+                headerShown: true,
+                title: "Members",
               }}
             />
           </Stack.Navigator>
