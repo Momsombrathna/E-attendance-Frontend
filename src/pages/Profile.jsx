@@ -14,7 +14,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeContext } from "../hooks/ThemeContext";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
@@ -22,6 +21,7 @@ import moment from "moment";
 import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 import LoadingScreen from "./LoadingScreen";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -34,13 +34,8 @@ export default function Profile() {
 
   const { darkMode } = useContext(ThemeContext);
 
-  const styles = darkMode ? darkStyles : lightStyles;
-
   useEffect(() => {
     getUserData();
-  }, [userId]);
-
-  useEffect(() => {
     getCardData();
   }, [userId]);
 
@@ -141,89 +136,164 @@ export default function Profile() {
     }
   };
 
-  // const handleDownload = async () => {
-  //   try {
-  //     const uri = await captureRef(qrCodeRef, {
-  //       format: "png",
-  //       quality: 0.8,
-  //     });
-
-  //     const asset = await MediaLibrary.createAssetAsync(uri);
-  //     await MediaLibrary.createAlbumAsync("Download", asset, false);
-  //     alert("Image saved to gallery");
-  //   } catch (error) {
-  //     console.error("Failed to save QR code", error);
-  //   }
-  // };
-
-  // const handleDownload = async (uri) => {
-  //   const { status } = await MediaLibrary.requestPermissionsAsync();
-  //   if (status !== "granted") {
-  //     alert("Please allow permissions to download");
-  //     return;
-  //   }
-
-  //   let date = moment().format("YYYYMMDDhhmmss");
-  //   let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
-
-  //   try {
-  //     const res = await FileSystem.downloadAsync(uri, fileUri);
-  //     saveFile(res.uri);
-  //     alert("File saved successfully");
-  //   } catch (err) {
-  //     console.log("FS Err: ", err);
-  //   }
-  // };
-  // const saveFile = async (fileUri) => {
-  //   try {
-  //     const asset = await MediaLibrary.createAssetAsync(fileUri);
-  //     const album = await MediaLibrary.getAlbumAsync("Download");
-  //     if (album == null) {
-  //       await MediaLibrary.createAlbumAsync("Download", asset, false);
-  //     } else {
-  //       await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-  //     }
-  //   } catch (err) {
-  //     console.log("Save err: ", err);
-  //   }
-  // };
-
-  // console.log(token);
-
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text
-              style={{
-                marginRight: 25,
-                fontWeight: "600",
-                fontSize: 18,
-                color: darkMode ? "#fff" : "#000",
-              }}
-            >
-              Log Out
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() =>
               navigation.navigate("GenerateCard", {
                 token: token,
               })
             }
           >
-            <Ionicons
-              name="pencil-sharp"
-              size={30}
-              color={darkMode ? "#fff" : "#000"}
+            <Icon
+              name="edit"
+              size={24}
+              color={darkMode ? "#fff" : "#2F3791"}
+              style={{ marginRight: 25 }}
+            />
+          </TouchableOpacity> */}
+          <TouchableOpacity onPress={handleLogout}>
+            <Icon
+              name="sign-out"
+              size={24}
+              color={darkMode ? "#fff" : "#444"}
               style={{ marginRight: 25 }}
             />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, darkMode]);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: darkMode ? "#333" : "#fff",
+      width: "100%",
+    },
+    image: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      objectFit: "fit",
+    },
+    userName: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: darkMode ? "#fff" : "#444",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    userEmail: {
+      fontSize: 14,
+      color: darkMode ? "#fff" : "#444",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    header: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: "white",
+    },
+    text: {
+      fontSize: 14,
+      color: "white",
+    },
+    card: {
+      padding: 10,
+      width: "90%",
+      height: 200,
+      borderRadius: 5,
+      marginTop: 25,
+      marginBottom: 5,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.23,
+      shadowRadius: 2.62,
+      elevation: 4,
+    },
+    rowItem: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    qrCode: {
+      width: 100,
+      height: 100,
+      borderRadius: 10,
+      borderColor: "black",
+      borderWidth: 1,
+    },
+    qrCodeContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 10,
+      borderColor: "black",
+      borderWidth: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    userProfileContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      gap: 10,
+      width: "90%",
+      height: 150,
+      padding: 10,
+      marginTop: 10,
+      borderRadius: 5,
+    },
+    textsContainer: {
+      gap: 5,
+      paddingHorizontal: 10,
+      height: "100%",
+      marginTop: 10,
+      width: "70%",
+      backgroundColor: darkMode ? "#444" : "#eee",
+      padding: 5,
+      borderRadius: 10,
+      alignItems: "start",
+      justifyContent: "center",
+      marginBottom: 10,
+    },
+    profileImageContainer: {
+      height: "100%",
+      backgroundColor: darkMode ? "#444" : "#eee",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 10,
+      borderRadius: 10,
+    },
+    cardsContainer: {
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    edit: {
+      flexDirection: "row",
+      gap: 10,
+      width: "90%",
+    },
+    editProfile: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 10,
+      borderRadius: 10,
+      backgroundColor: darkMode ? "#444" : "#eee",
+    },
+    editProfileButton: {
+      flex: 1,
+      marginBottom: 10,
+    },
+  });
 
   return (
     <>
@@ -232,99 +302,220 @@ export default function Profile() {
       ) : (
         <ScrollView style={styles.container}>
           <View style={{ alignItems: "center" }}>
-            <Image style={styles.image} source={{ uri: user.profile }} />
-            <Text style={styles.userName}>
-              {card.lastName} {card.firstName}
-            </Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
-            <LinearGradient
-              style={[styles.card]}
-              colors={darkMode ? ["#333", "#555"] : ["#2F3791", "#8089EB"]}
-              start={{ x: 0, y: 0.7 }}
-              end={{ x: 0.3, y: 0 }}
-            >
-              <View
-                style={[
-                  styles.container,
+            <View style={styles.userProfileContainer}>
+              <View style={styles.profileImageContainer}>
+                <Image
+                  style={styles.image}
+                  source={{ uri: user.profile }}
+                  resizeMode="cover"
+                />
+              </View>
+              <View style={styles.textsContainer}>
+                <Text style={styles.userName}>
+                  {user.username}{" "}
+                  {user.verified ? (
+                    <View
+                      style={{
+                        backgroundColor: "green",
+                        padding: 2,
+                        borderRadius: 20,
+                      }}
+                    >
+                      <Icon name="check" size={16} color="white" />
+                    </View>
+                  ) : (
+                    <Icon name="times" size={16} color="red" />
+                  )}
+                </Text>
+
+                <Text style={styles.userEmail}>{user.email}</Text>
+
+                <Text style={styles.userEmail}>
+                  Role:{" "}
                   {
-                    backgroundColor: "transparent",
-                    justifyContent: "space-between",
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.rowItem,
-                    {
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                    },
-                  ]}
-                >
-                  <Image
-                    style={[styles.qrCode, { width: 80, height: 80 }]}
-                    source={{ uri: card.profile }}
-                  />
-                  <View style={{ alignItems: "flex-end" }}>
                     <Text
+                      style={{
+                        color:
+                          user.role === "admin"
+                            ? darkMode
+                              ? "yellow"
+                              : "purple"
+                            : darkMode
+                            ? "#fff"
+                            : "#444",
+                      }}
+                    >
+                      {user.role}
+                    </Text>
+                  }
+                </Text>
+                <Text style={styles.userEmail}>
+                  Created At: {moment(user.created).format("LL")}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.edit}>
+              <TouchableOpacity
+                style={styles.editProfileButton}
+                onPress={() =>
+                  navigation.navigate("GenerateCard", {
+                    token: token,
+                  })
+                }
+              >
+                <View style={styles.editProfile}>
+                  <Icon
+                    name="edit"
+                    size={24}
+                    color={darkMode ? "#fff" : "#444"}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text style={{ color: darkMode ? "#fff" : "#444" }}>
+                    Edit Profile
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.editProfileButton}
+                onPress={() =>
+                  card.message
+                    ? navigation.navigate("GenerateCard")
+                    : navigation.navigate("EditCard", { card: card })
+                }
+              >
+                <View style={styles.editProfile}>
+                  {card.message ? (
+                    <Icon
+                      name="id-card"
+                      size={24}
+                      color={darkMode ? "#fff" : "#444"}
+                      style={{ marginRight: 10 }}
+                    />
+                  ) : (
+                    <Icon
+                      name="edit"
+                      size={24}
+                      color={darkMode ? "#fff" : "#444"}
+                      style={{ marginRight: 10 }}
+                    />
+                  )}
+                  <Text style={{ color: darkMode ? "#fff" : "#444" }}>
+                    {card.message ? "Create Card" : "Edit Card"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.cardsContainer}>
+              {card.message ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "90%",
+                    height: 500,
+                    borderRadius: 10,
+                    backgroundColor: darkMode ? "#444" : "#eee",
+                  }}
+                >
+                  <Icon name="exclamation-triangle" size={50} color="#ccc" />
+                  <Text style={{ color: "#ccc", fontSize: 20, marginTop: 10 }}>
+                    No card found
+                  </Text>
+                </View>
+              ) : (
+                <LinearGradient
+                  style={[styles.card]}
+                  colors={darkMode ? ["#333", "#555"] : ["#2F3791", "#8089EB"]}
+                  start={{ x: 0, y: 0.7 }}
+                  end={{ x: 0.3, y: 0 }}
+                >
+                  <View
+                    style={[
+                      styles.container,
+                      {
+                        backgroundColor: "transparent",
+                        justifyContent: "space-between",
+                      },
+                    ]}
+                  >
+                    <View
                       style={[
-                        styles.text,
+                        styles.rowItem,
                         {
-                          fontSize: 12,
-                          backgroundColor: user.verified ? "green" : "red",
-                          padding: 5,
-                          borderRadius: 5,
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
                         },
                       ]}
                     >
-                      {user.verified ? "Verified" : "Not Verified"}
-                    </Text>
-                    <Text style={styles.text}>
-                      Student ID: {hashUserId(card.userId)}
-                    </Text>
-                  </View>
-                </View>
+                      <Image
+                        style={[styles.qrCode, { width: 80, height: 80 }]}
+                        source={{ uri: card.profile }}
+                      />
+                      <View style={{ alignItems: "flex-end" }}>
+                        <Text
+                          style={[
+                            styles.text,
+                            {
+                              fontSize: 12,
+                              backgroundColor: user.verified ? "green" : "red",
+                              padding: 5,
+                              borderRadius: 5,
+                            },
+                          ]}
+                        >
+                          {user.verified ? "Verified" : "Not Verified"}
+                        </Text>
+                        <Text style={styles.text}>
+                          Student ID: {hashUserId(card.userId)}
+                        </Text>
+                      </View>
+                    </View>
 
-                <View style={[styles.rowItem, { alignItems: "center" }]}>
-                  <View style={{ alignItems: "flex-start" }}>
-                    <Text style={styles.text}>
-                      <Text style={{ fontWeight: "bold" }}>Name: </Text>{" "}
-                      {card.lastName} {card.firstName}
-                    </Text>
-                    <Text style={styles.text}>
-                      <Text style={{ fontWeight: "bold" }}>Date of Birth:</Text>{" "}
-                      {new Date(card.dateOfBirth).toLocaleDateString()}
-                    </Text>
-                    <Text style={styles.text}>
-                      <Text style={{ fontWeight: "bold" }}>Gender: </Text>{" "}
-                      {card.sex}
-                    </Text>
-                    <Text style={styles.text}>
-                      <Text style={{ fontWeight: "bold" }}>Address: </Text>{" "}
-                      {card.address}
-                    </Text>
-                    <Text style={styles.text}>
-                      <Text style={{ fontWeight: "bold" }}>Phone: </Text>{" "}
-                      {card.phoneNumber}
-                    </Text>
-                  </View>
-                  <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={isImageModalVisible}
-                    onRequestClose={() => {
-                      setImageModalVisible(!isImageModalVisible);
-                    }}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        backgroundColor: "black",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      {/* <Image
+                    <View style={[styles.rowItem, { alignItems: "center" }]}>
+                      <View style={{ alignItems: "flex-start" }}>
+                        <Text style={styles.text}>
+                          <Text style={{ fontWeight: "bold" }}>Name: </Text>{" "}
+                          {card.lastName} {card.firstName}
+                        </Text>
+                        <Text style={styles.text}>
+                          <Text style={{ fontWeight: "bold" }}>
+                            Date of Birth:
+                          </Text>{" "}
+                          {new Date(card.dateOfBirth).toLocaleDateString()}
+                        </Text>
+                        <Text style={styles.text}>
+                          <Text style={{ fontWeight: "bold" }}>Gender: </Text>{" "}
+                          {card.sex}
+                        </Text>
+                        <Text style={styles.text}>
+                          <Text style={{ fontWeight: "bold" }}>Address: </Text>{" "}
+                          {card.address}
+                        </Text>
+                        <Text style={styles.text}>
+                          <Text style={{ fontWeight: "bold" }}>Phone: </Text>{" "}
+                          {card.phoneNumber}
+                        </Text>
+                      </View>
+                      <Modal
+                        animationType="slide"
+                        transparent={false}
+                        visible={isImageModalVisible}
+                        onRequestClose={() => {
+                          setImageModalVisible(!isImageModalVisible);
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            backgroundColor: "black",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          {/* <Image
                         source={{ uri: card.qrCode }}
                         style={{
                           width: "100%",
@@ -332,145 +523,57 @@ export default function Profile() {
                           resizeMode: "contain",
                         }}
                       /> */}
-                      <ViewShot
-                        ref={qrCodeRef}
-                        style={{ padding: 10, backgroundColor: "#fff" }}
-                      >
-                        <QRCode
-                          value={card.userId}
-                          size={300}
-                          backgroundColor="#fff"
-                          color="#000"
-                          padding={10}
-                          logo={{ uri: card.profile }}
-                        />
-                      </ViewShot>
-                      <TouchableOpacity
-                        style={{ position: "absolute", top: 50, right: 20 }}
-                        onPress={() => captureAndSaveImage()}
-                      >
-                        <Ionicons
-                          name="download-outline"
-                          color={"white"}
-                          size={24}
-                        />
-                      </TouchableOpacity>
+                          <ViewShot
+                            ref={qrCodeRef}
+                            style={{ padding: 10, backgroundColor: "#fff" }}
+                          >
+                            <QRCode
+                              value={card.userId}
+                              size={300}
+                              backgroundColor="#fff"
+                              color="#000"
+                              padding={10}
+                              logo={{ uri: card.profile }}
+                            />
+                          </ViewShot>
+                          <TouchableOpacity
+                            style={{ position: "absolute", top: 50, right: 20 }}
+                            onPress={() => captureAndSaveImage()}
+                          >
+                            <Text style={{ color: "white", fontSize: 20 }}>
+                              Save
+                            </Text>
+                          </TouchableOpacity>
 
+                          <TouchableOpacity
+                            style={{ position: "absolute", top: 53, left: 20 }}
+                            onPress={() => setImageModalVisible(false)}
+                          >
+                            <Text style={{ color: "white", fontSize: 20 }}>
+                              Close
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </Modal>
                       <TouchableOpacity
-                        style={{ position: "absolute", top: 53, left: 20 }}
-                        onPress={() => setImageModalVisible(false)}
+                        onPress={() => setImageModalVisible(true)}
                       >
-                        <Text style={{ color: "white", fontSize: 20 }}>
-                          Close
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Modal>
-                  <TouchableOpacity onPress={() => setImageModalVisible(true)}>
-                    <View style={styles.qrCodeContainer}>
-                      <QRCode value={card.userId} />
-                    </View>
-                    {/* <Image
+                        <View style={styles.qrCodeContainer}>
+                          <QRCode value={card.userId} />
+                        </View>
+                        {/* <Image
                       style={styles.qrCode}
                       source={{ uri: card.qrCode }}
                     /> */}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </LinearGradient>
+              )}
+            </View>
           </View>
         </ScrollView>
       )}
     </>
   );
 }
-
-const lightStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 80,
-    borderColor: "black",
-    borderWidth: 1,
-    objectFit: "fit",
-    marginTop: 25,
-    marginBottom: 5,
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "black",
-  },
-  userEmail: {
-    fontSize: 14,
-    color: "#919191",
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-  },
-  text: {
-    fontSize: 14,
-    color: "white",
-  },
-  card: {
-    padding: 10,
-    width: "90%",
-    height: 200,
-    borderRadius: 5,
-    marginTop: 25,
-    marginBottom: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-  },
-  rowItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  qrCode: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    borderColor: "black",
-    borderWidth: 1,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  ...lightStyles,
-  container: {
-    ...lightStyles.container,
-    backgroundColor: "#333",
-  },
-  image: {
-    ...lightStyles.image,
-    borderColor: "white",
-  },
-  userName: {
-    ...lightStyles.userName,
-    color: "white",
-  },
-  userEmail: {
-    ...lightStyles.userEmail,
-    color: "#919191",
-  },
-  card: {
-    ...lightStyles.card,
-    backgroundColor: "#555",
-  },
-  qrCode: {
-    ...lightStyles.qrCode,
-    borderColor: "white",
-  },
-});

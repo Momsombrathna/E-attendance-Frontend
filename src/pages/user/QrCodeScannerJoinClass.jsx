@@ -7,6 +7,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Button,
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -32,11 +33,28 @@ export default function QrCodeScannerJoinClass() {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
+      <View
+        style={{
+          height: 500,
+          backgroundColor: "#eee",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
         <Text style={{ textAlign: "center" }}>
           We need your permission to show the camera
         </Text>
-        <Button onPress={requestPermission} title="grant permission" />
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#2F3791",
+            padding: 10,
+            borderRadius: 5,
+          }}
+          onPress={requestPermission}
+        >
+          <Text style={{ color: "#fff" }}>Allow Camera</Text>
+        </TouchableOpacity>
       </View>
     );
   }

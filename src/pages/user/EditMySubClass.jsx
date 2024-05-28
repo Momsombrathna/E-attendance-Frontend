@@ -65,12 +65,15 @@ export default function EditMySubClass({ route }) {
   };
 
   const locationRanges = [
-    { label: "5x5m", value: 0.005 },
-    { label: "10x10m", value: 0.01 },
-    { label: "15x15m", value: 0.015 },
-    { label: "20x20m", value: 0.02 },
-    { label: "25x25m", value: 0.025 },
-    { label: "30x30m", value: 0.03 },
+    { label: "10m", value: 0.01 },
+    { label: "15m", value: 0.015 },
+    { label: "20m", value: 0.02 },
+    { label: "25m", value: 0.025 },
+    { label: "30m", value: 0.03 },
+    { label: "35m", value: 0.035 },
+    { label: "40m", value: 0.04 },
+    { label: "45m", value: 0.045 },
+    { label: "50m", value: 0.05 },
   ];
 
   useEffect(() => {
@@ -141,7 +144,7 @@ export default function EditMySubClass({ route }) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: darkMode ? "#555" : "#fff",
+      backgroundColor: darkMode ? "#000" : "#fff",
     },
     title: {
       fontSize: 24,
@@ -178,7 +181,7 @@ export default function EditMySubClass({ route }) {
       alignItems: "center",
     },
     buttonText: {
-      color: "#fff",
+      color: darkMode ? "#fff" : "#fff",
       fontWeight: "bold",
     },
     loadingView: {
@@ -215,23 +218,26 @@ export default function EditMySubClass({ route }) {
     label: {
       fontSize: 14,
       fontWeight: "bold",
-      color: darkMode ? "#0000FF" : "#2F3791",
+      color: darkMode ? "#fff" : "#2F3791",
       opacity: 0.9,
       paddingLeft: 5,
       marginBottom: 10,
     },
     rangPicker: {
       flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-around",
       marginBottom: 10,
     },
     rangeButton: {
+      height: 40,
       backgroundColor: darkMode ? "#333" : "#eee",
-      padding: 10,
       borderRadius: 10,
-      marginHorizontal: 5,
-    },
-    rangeText: {
-      color: darkMode ? "#fff" : "#000",
+      padding: 10,
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: 5,
     },
   });
 
@@ -307,7 +313,11 @@ export default function EditMySubClass({ route }) {
                     styles.textInput,
                     {
                       color:
-                        location_range === String(item.value) ? "#fff" : darkMode ? "#fff" : "#000",
+                        location_range === String(item.value)
+                          ? "#fff"
+                          : darkMode
+                          ? "#fff"
+                          : "#000",
                     },
                   ]}
                 >

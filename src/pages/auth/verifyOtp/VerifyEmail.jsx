@@ -18,7 +18,7 @@ import { API_URL } from "../../../api/config";
 import axios from "axios";
 
 export default function VerifyEmail({ route }) {
-  const { email } = route.params;
+  const { email, password } = route.params;
   const [errors, setErrors] = useState({ otp: "" });
   const [loading, setLoading] = useState(false);
   const [counter, setCounter] = useState(120);
@@ -66,7 +66,10 @@ export default function VerifyEmail({ route }) {
         otp: enteredOtp,
       });
       Alert.alert("Success", otpResponse.data.message);
-      navigation.navigate("Login");
+      navigation.navigate("Login", {
+        emails: email,
+        passwords: password,
+      });
     } catch (error) {
       setErrors({ otp: error.response.data.message });
     } finally {

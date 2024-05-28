@@ -70,12 +70,15 @@ export default function CreateSubClasses({ route }) {
   };
 
   const locationRanges = [
-    { label: "5x5m", value: 0.005 },
-    { label: "10x10m", value: 0.01 },
-    { label: "15x15m", value: 0.015 },
-    { label: "20x20m", value: 0.02 },
-    { label: "25x25m", value: 0.025 },
-    { label: "30x30m", value: 0.03 },
+    { label: "10m", value: 0.01 },
+    { label: "15m", value: 0.015 },
+    { label: "20m", value: 0.02 },
+    { label: "25m", value: 0.025 },
+    { label: "30m", value: 0.03 },
+    { label: "35m", value: 0.035 },
+    { label: "40m", value: 0.04 },
+    { label: "45m", value: 0.045 },
+    { label: "50m", value: 0.05 },
   ];
 
   useEffect(() => {

@@ -154,7 +154,7 @@ export default function Register() {
       }
 
       // Navigate to the verification page
-      navigation.navigate("VerifyEmail", { email });
+      navigation.navigate("VerifyEmail", { email, password });
     } catch (error) {
       setError(error.message);
     }

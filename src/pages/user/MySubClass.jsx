@@ -20,6 +20,8 @@ import { Swipeable } from "react-native-gesture-handler";
 import { renderRightAction } from "../partials/Swapeable";
 import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
+import moment from "moment";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function MySubClasses({ route }) {
   const { classId, token, code, className, classProfile } = route.params;
@@ -39,33 +41,28 @@ export default function MySubClasses({ route }) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: darkMode ? "#000" : "#fff",
-      paddingHorizontal: 5,
+      backgroundColor: darkMode ? "#333" : "#fff",
+      marginHorizontal: 10,
     },
     subClass: {
-      padding: 10,
-      margin: 5,
-      borderStartColor: darkMode ? "#fff" : "#2F3791",
-      borderStartWidth: 5,
-      borderRadius: 10,
-      backgroundColor: darkMode ? "#333" : "#FFFFFF",
-      shadowColor: darkMode ? "#fff" : "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+      margin: 4,
+      borderRadius: 5,
+      borderStartColor: "#2F3791",
+      borderStartWidth: 7,
+      backgroundColor: darkMode ? "#444" : "#eee",
     },
     subClassName: {
       fontSize: 18,
       fontWeight: "bold",
-      color: darkMode ? "#fff" : "#000",
+      color: darkMode ? "#fff" : "#444",
+      overflow: "hidden",
+      width: 200,
+      TextOverflow: "ellipsis",
     },
     name: {
-      maxWidth: 100,
-      marginBottom: 5,
+      flexDirection: "column",
+      gap: 5,
+      padding: 5,
     },
     time: {
       fontSize: 14,
@@ -76,20 +73,16 @@ export default function MySubClasses({ route }) {
       backgroundColor: darkMode ? "#222" : "#f2f2f2",
     },
     locationRange: {
-      fontSize: 14,
-      color: darkMode ? "#fff" : "#666",
-      marginRight: 5,
-      padding: 5,
-      borderRadius: 5,
-      backgroundColor: darkMode ? "#222" : "#f2f2f2",
+      fontSize: 13,
+      color: darkMode ? "#fff" : "#eee",
     },
     map: {
       width: "100%",
       height: "90%",
     },
     body: {
+      width: "90%",
       flexDirection: "row",
-      alignItems: "center",
       justifyContent: "space-between",
     },
     date: {
@@ -97,8 +90,16 @@ export default function MySubClasses({ route }) {
       color: darkMode ? "#fff" : "#666",
     },
     dateRange: {
-      fontSize: 14,
+      fontSize: 13,
       color: darkMode ? "#fff" : "#666",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 150,
+    },
+    dateRangeContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
     },
     checkedInCount: {
       fontSize: 14,
@@ -107,8 +108,8 @@ export default function MySubClasses({ route }) {
     },
     checkedOutCount: {
       fontSize: 14,
-      color: "#fff",
       padding: 5,
+      color: "#fff",
     },
 
     checkedInCountContainer: {
@@ -125,8 +126,28 @@ export default function MySubClasses({ route }) {
       maxWidth: 100,
       opacity: 0.8,
       marginTop: 5,
-      marginRight: 5,
       padding: 3,
+      borderRadius: 5,
+    },
+    checkInFooter: {
+      backgroundColor: "green",
+      padding: 5,
+      borderRadius: 5,
+    },
+    CheckOutFooter: {
+      backgroundColor: "#FF453A",
+      padding: 5,
+      borderRadius: 5,
+    },
+    rangFooter: {
+      backgroundColor: "#FFA500",
+      padding: 5,
+      borderRadius: 5,
+    },
+    timeFooter: {
+      backgroundColor: darkMode ? "#222" : "#fff",
+      padding: 5,
+      width: 160,
       borderRadius: 5,
     },
   });
@@ -240,6 +261,18 @@ export default function MySubClasses({ route }) {
     }
   };
 
+  const locationRanges = [
+    { label: "10m", value: 0.01 },
+    { label: "15m", value: 0.015 },
+    { label: "20m", value: 0.02 },
+    { label: "25m", value: 0.025 },
+    { label: "30m", value: 0.03 },
+    { label: "35m", value: 0.035 },
+    { label: "40m", value: 0.04 },
+    { label: "45m", value: 0.045 },
+    { label: "50m", value: 0.05 },
+  ];
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -252,6 +285,17 @@ export default function MySubClasses({ route }) {
             color: "#2F3791",
           }}
         />
+      ) : subClass &&
+        subClass.attendance &&
+        subClass.attendance.length === 0 ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Icon name="exclamation-triangle" size={50} color="#ccc" />
+          <Text style={{ color: "#ccc", fontSize: 20, marginTop: 10 }}>
+            No Attendance found
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={subClass.attendance}
@@ -288,74 +332,96 @@ export default function MySubClasses({ route }) {
                         {item.description}
                       </Text>
                     </View>
-                    <Text style={styles.dateRange}>
-                      {new Intl.DateTimeFormat("default", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      }).format(new Date(item.created))}
-                    </Text>
-                  </View>
 
-                  <View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={styles.time}>
-                        {new Intl.DateTimeFormat("default", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }).format(new Date(item.from))}{" "}
-                        -{" "}
-                        {new Intl.DateTimeFormat("default", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }).format(new Date(item.to))}
-                      </Text>
-                      <Text style={styles.locationRange}>
-                        Range: {item.location_range}
-                      </Text>
+                    <View style={styles.dateRangeContainer}>
+                      <View style={styles.timeFooter}>
+                        <Text style={styles.dateRange}>
+                          {moment(item.from).format("MMM DD,YYYY hh:mm A")}
+                        </Text>
+                      </View>
+                      <Feather
+                        name="arrow-right"
+                        size={20}
+                        color={darkMode ? "#fff" : "#666"}
+                      />
+                      <View style={styles.timeFooter}>
+                        <Text style={styles.dateRange}>
+                          {moment(item.to).format("MMM DD,YYYY hh:mm A")}
+                        </Text>
+                      </View>
                     </View>
                     <View
                       style={{
                         flexDirection: "row",
-                        alignItems: "center",
+                        gap: 5,
                       }}
                     >
-                      <View style={styles.checkedInCountContainer}>
-                        <Text style={styles.checkedInCount}>
-                          {"checked in: " +
+                      <View style={styles.checkInFooter}>
+                        <Text style={styles.locationRange}>
+                          Check in:{" "}
+                          {
                             item.attendances.filter(
                               (attendance) => attendance.checkedIn
-                            ).length}
+                            ).length
+                          }{" "}
                         </Text>
                       </View>
-                      <View style={styles.checkedOutCountContainer}>
-                        <Text style={styles.checkedOutCount}>
-                          {"Check out: " +
+
+                      <View style={styles.CheckOutFooter}>
+                        <Text style={styles.locationRange}>
+                          Check out:{" "}
+                          {
                             item.attendances.filter(
                               (attendance) => attendance.checkedOut
-                            ).length}
+                            ).length
+                          }
                         </Text>
                       </View>
+                      <View style={styles.rangFooter}>
+                        <Text style={styles.locationRange}>
+                          Range:{" "}
+                          {
+                            locationRanges.find(
+                              (range) => range.value === item.location_range
+                            ).label
+                          }
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCurrentLocation({
+                            latitude: item.latitude,
+                            longitude: item.longitude,
+                            location_range: item.location_range,
+                          });
+                          setModalVisible(true);
+                        }}
+                      >
+                        <View
+                          style={{
+                            backgroundColor: "#2F3791",
+                            padding: 5,
+                            borderRadius: 5,
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 5,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#fff",
+                              fontSize: 14,
+                              borderRadius: 5,
+                            }}
+                          >
+                            View
+                          </Text>
+                          <Feather name="map-pin" size={16} color="#fff" />
+                        </View>
+                      </TouchableOpacity>
                     </View>
                   </View>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCurrentLocation({
-                        latitude: item.latitude,
-                        longitude: item.longitude,
-                        location_range: item.location_range,
-                      });
-                      setModalVisible(true);
-                    }}
-                  >
-                    <Feather name="map-pin" size={30} color="#666" />
-                  </TouchableOpacity>
                 </View>
               </TouchableOpacity>
             </Swipeable>

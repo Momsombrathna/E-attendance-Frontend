@@ -15,6 +15,7 @@ import { API_URL, useUserData } from "../api/config";
 import { ThemeContext } from "../hooks/ThemeContext";
 import { renderRightAction } from "./partials/Swapeable";
 import { Swipeable } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Classes = () => {
   const navigation = useNavigation();
@@ -23,8 +24,6 @@ const Classes = () => {
   const { token, userId } = useUserData();
 
   const { darkMode } = useContext(ThemeContext);
-
-  const styles = darkMode ? darkStyles : lightStyles;
 
   const getClassData = async () => {
     setLoading(true);
@@ -128,6 +127,47 @@ const Classes = () => {
     }
   };
 
+  const styles = StyleSheet.create({
+    main: {
+      flex: 1,
+      backgroundColor: darkMode ? "#121212" : "#fff",
+      paddingHorizontal: 5,
+    },
+    container: {
+      margin: 5,
+      padding: 5,
+      borderRadius: 5,
+      borderStartColor: "#2F3791",
+      borderStartWidth: 7,
+      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+    },
+
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 60,
+    },
+    image: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      marginRight: 10,
+    },
+    text: {
+      fontSize: 18,
+      color: darkMode ? "#eee" : "#333",
+    },
+    nameText: {
+      marginTop: 5,
+      fontSize: 12,
+      color: darkMode ? "#ccc" : "#777",
+    },
+    textView: {
+      justifyContent: "center",
+      flexDirection: "column",
+    },
+  });
+
   return (
     <View style={styles.main}>
       {loading ? (
@@ -136,124 +176,66 @@ const Classes = () => {
         >
           <ActivityIndicator size="large" color="#eee" />
         </View>
+      ) : classData.length === 0 ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Icon name="exclamation-triangle" size={50} color="#ccc" />
+          <Text style={{ color: "#ccc", fontSize: 20, marginTop: 10 }}>
+            No class found
+          </Text>
+        </View>
       ) : (
-        <FlatList
-          data={classData}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={{ margin: -2 }}>
-              <Swipeable
-                friction={2}
-                leftThreshold={1}
-                renderRightActions={(progress) =>
-                  renderRightActions(progress, item._id)
-                }
-              >
-                <TouchableOpacity
-                  style={styles.container}
-                  onPress={() =>
-                    navigation.navigate("SubClass", {
-                      classId: item._id,
-                      token: token,
-                      className: item.className,
-                    })
+        <>
+          <FlatList
+            data={classData}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View style={{ margin: -2 }}>
+                <Swipeable
+                  friction={2}
+                  leftThreshold={1}
+                  renderRightActions={(progress) =>
+                    renderRightActions(progress, item._id)
                   }
                 >
-                  <View style={styles.content}>
-                    <Image
-                      source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                      style={styles.image}
-                    />
-                    <View style={styles.textView}>
-                      <Text
-                        style={styles.text}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item.className}
-                      </Text>
-                      <Text style={styles.nameText}>
-                        Owner: {item.ownerName}
-                      </Text>
+                  <TouchableOpacity
+                    style={styles.container}
+                    onPress={() =>
+                      navigation.navigate("SubClass", {
+                        classId: item._id,
+                        token: token,
+                        className: item.className,
+                      })
+                    }
+                  >
+                    <View style={styles.content}>
+                      <Image
+                        source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                        style={styles.image}
+                      />
+                      <View style={styles.textView}>
+                        <Text
+                          style={styles.text}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {item.className}
+                        </Text>
+                        <Text style={styles.nameText}>
+                          Owner: {item.ownerName}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              </Swipeable>
-            </View>
-          )}
-        />
+                  </TouchableOpacity>
+                </Swipeable>
+              </View>
+            )}
+          />
+        </>
       )}
     </View>
   );
 };
 
 export default Classes;
-
-const lightStyles = StyleSheet.create({
-  main: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 5,
-  },
-  container: {
-    padding: 10,
-    margin: 5,
-    borderStartColor: "#2F3791",
-    borderStartWidth: 5,
-    borderRadius: 5,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 60,
-  },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 10,
-  },
-  text: {
-    fontSize: 18,
-  },
-  nameText: {
-    marginTop: 5,
-    fontSize: 14,
-    color: "#666",
-  },
-  textView: {
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  ...lightStyles,
-  main: {
-    ...lightStyles.main,
-    backgroundColor: "#333",
-  },
-  container: {
-    ...lightStyles.container,
-    borderStartColor: "#fffa",
-    backgroundColor: "#555",
-  },
-  text: {
-    ...lightStyles.text,
-    color: "#fff",
-  },
-  nameText: {
-    ...lightStyles.nameText,
-    color: "#ccc",
-  },
-});

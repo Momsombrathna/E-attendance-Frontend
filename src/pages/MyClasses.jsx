@@ -15,6 +15,7 @@ import { API_URL, useUserData } from "../api/config";
 import { renderRightAction } from "./partials/Swapeable";
 import axios from "axios";
 import { ThemeContext } from "../hooks/ThemeContext";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const MyClasses = () => {
   const navigation = useNavigation();
@@ -118,7 +119,63 @@ const MyClasses = () => {
     }
   };
 
-  const styles = darkMode ? darkStyles : lightStyles;
+  const styles = StyleSheet.create({
+    main: {
+      flex: 1,
+      backgroundColor: darkMode ? "#121212" : "#fff",
+      paddingHorizontal: 5,
+    },
+    container: {
+      margin: 5,
+      padding: 5,
+      borderRadius: 5,
+      borderStartColor: "#2F3791",
+      borderStartWidth: 7,
+      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+    },
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 60,
+    },
+    image: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      marginRight: 10,
+    },
+    text: {
+      fontSize: 18,
+      maxWidth: 200,
+      color: darkMode ? "#eee" : "#333",
+    },
+    nameText: {
+      marginTop: 5,
+      fontSize: 14,
+      color: darkMode ? "#eee" : "#333",
+    },
+    textView: {
+      justifyContent: "center",
+      flexDirection: "column",
+    },
+    viewsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    studentCount: {
+      justifyContent: "center",
+      alignItems: "center",
+      width: 20,
+      height: 20,
+      backgroundColor: "#eee",
+      borderRadius: 10,
+    },
+    studentCountText: {
+      color: darkMode ? "#333" : "#eee",
+      fontSize: 12,
+    },
+  });
 
   return (
     <View style={styles.main}>
@@ -127,6 +184,15 @@ const MyClasses = () => {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <ActivityIndicator size="large" color="#eee" />
+        </View>
+      ) : classData.length === 0 ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Icon name="exclamation-triangle" size={50} color="#ccc" />
+          <Text style={{ color: "#ccc", fontSize: 20, marginTop: 10 }}>
+            No class found
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -186,182 +252,3 @@ const MyClasses = () => {
 };
 
 export default MyClasses;
-
-// const styles = StyleSheet.create({
-//   main: {
-//     flex: 1,
-//     backgroundColor: "#fff",
-//     paddingHorizontal: 5,
-//   },
-//   container: {
-//     padding: 10,
-//     margin: 5,
-//     borderStartColor: "#2F3791",
-//     borderStartWidth: 5,
-//     borderRadius: 5,
-//     backgroundColor: "#FFFFFF",
-//     shadowColor: "#000",
-//     shadowOffset: {
-//       width: 0,
-//       height: 1,
-//     },
-//     shadowOpacity: 0.22,
-//     shadowRadius: 3.84,
-//     elevation: 5,
-//   },
-//   content: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     height: 60,
-//   },
-//   image: {
-//     width: 60,
-//     height: 60,
-//     borderRadius: 30,
-//     marginRight: 10,
-//   },
-//   text: {
-//     fontSize: 18,
-//     maxWidth: 200,
-//   },
-//   nameText: {
-//     marginTop: 5,
-//     fontSize: 14,
-//     color: "#666",
-//   },
-//   textView: {
-//     justifyContent: "center",
-//     flexDirection: "column",
-//   },
-//   viewsContainer: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//   },
-//   studentCount: {
-//     justifyContent: "center",
-//     alignItems: "center",
-//     width: 20,
-//     height: 20,
-//     backgroundColor: "#eee",
-//     borderRadius: 10,
-//   },
-//   studentCountText: {
-//     color: "#000",
-//     fontSize: 12,
-//   },
-// });
-
-// const darkStyles = StyleSheet.create({
-//   container: {
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     backgroundColor: "#333",
-//   },
-//   studentCount: {
-//     justifyContent: "center",
-//     alignItems: "center",
-//     width: 20,
-//     height: 20,
-//     backgroundColor: "#555",
-//     borderRadius: 10,
-//   },
-//   studentCountText: {
-//     color: "#fff",
-//     fontSize: 12,
-//   },
-// });
-
-const lightStyles = StyleSheet.create({
-  main: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 5,
-  },
-  container: {
-    padding: 10,
-    margin: 5,
-    borderStartColor: "#2F3791",
-    borderStartWidth: 5,
-    borderRadius: 5,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 60,
-  },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 10,
-  },
-  text: {
-    fontSize: 18,
-    maxWidth: 200,
-  },
-  nameText: {
-    marginTop: 5,
-    fontSize: 14,
-    color: "#666",
-  },
-  textView: {
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-  viewsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  studentCount: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 20,
-    height: 20,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-  },
-  studentCountText: {
-    color: "#000",
-    fontSize: 12,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  ...lightStyles,
-  main: {
-    ...lightStyles.main,
-    backgroundColor: "#333",
-  },
-  container: {
-    ...lightStyles.container,
-    borderStartColor: "#fff",
-    backgroundColor: "#555",
-  },
-  text: {
-    ...lightStyles.text,
-    color: "#fff",
-  },
-  nameText: {
-    ...lightStyles.nameText,
-    color: "#aaa",
-  },
-  studentCount: {
-    ...lightStyles.studentCount,
-    backgroundColor: "#777",
-  },
-  studentCountText: {
-    ...lightStyles.studentCountText,
-    color: "#fff",
-  },
-});

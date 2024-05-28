@@ -179,7 +179,7 @@ export default function ViewMember({ route }) {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color="#2F3791" />
+          <ActivityIndicator size="large" color="#444" />
         </View>
       ) : (
         <FlatList
