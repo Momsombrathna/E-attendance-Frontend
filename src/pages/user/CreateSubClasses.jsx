@@ -170,7 +170,7 @@ export default function CreateSubClasses({ route }) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: darkMode ? "#000" : "#fff",
+      backgroundColor: darkMode ? "#333" : "#fff",
     },
     title: {
       fontSize: 24,
@@ -185,7 +185,7 @@ export default function CreateSubClasses({ route }) {
     },
     input: {
       height: 40,
-      backgroundColor: darkMode ? "#333" : "#eee",
+      backgroundColor: darkMode ? "#444" : "#eee",
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
@@ -213,7 +213,7 @@ export default function CreateSubClasses({ route }) {
     loadingView: {
       height: 300,
       borderRadius: 10,
-      backgroundColor: darkMode ? "#333" : "#eee",
+      backgroundColor: darkMode ? "#444" : "#eee",
       justifyContent: "center",
       alignItems: "center",
     },
@@ -223,7 +223,7 @@ export default function CreateSubClasses({ route }) {
     },
     dateInput: {
       height: 40,
-      backgroundColor: darkMode ? "#333" : "#eee",
+      backgroundColor: darkMode ? "#444" : "#eee",
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
@@ -331,7 +331,7 @@ export default function CreateSubClasses({ route }) {
                       location_range === item.value
                         ? "#2F3791"
                         : darkMode
-                        ? "#333"
+                        ? "#444"
                         : "#eee",
                   },
                 ]}

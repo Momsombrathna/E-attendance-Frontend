@@ -29,7 +29,7 @@ export default function CreateClass() {
     container: {
       marginTop: 10,
       flex: 1,
-      backgroundColor: darkMode ? "black" : "white",
+      backgroundColor: darkMode ? "#333" : "#fff",
       padding: 20,
     },
     header: {
@@ -53,7 +53,7 @@ export default function CreateClass() {
       color: darkMode ? "white" : "black",
     },
     input: {
-      backgroundColor: darkMode ? "#333" : "#eee",
+      backgroundColor: darkMode ? "#444" : "#eee",
       height: 50,
       padding: 10,
       marginBottom: 20,
@@ -85,6 +85,26 @@ export default function CreateClass() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+
+    if (!className) {
+      setError("Class name is required");
+      setLoading(false);
+      return;
+    }
+
+    // check if the class name is less than 3 characters
+    if (className.length < 3) {
+      setError("Class name must be at least 3 characters");
+      setLoading(false);
+      return;
+    }
+
+    // check if the class name is more than 30 characters
+    if (className.length > 50) {
+      setError("Class name must be less than 50 characters");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_URL}/class/create-class/${userId}`, {
@@ -130,7 +150,7 @@ export default function CreateClass() {
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      style={{ flex: 1, backgroundColor: darkMode ? "black" : "white" }}
+      style={{ flex: 1, backgroundColor: darkMode ? "#333" : "#fff" }}
     >
       <ScrollView>
         <View style={styles.container}>

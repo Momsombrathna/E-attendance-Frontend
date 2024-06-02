@@ -85,7 +85,7 @@ export default function SubClasses({ route }) {
     },
     map: {
       width: "100%",
-      height: "90%",
+      height: "95%",
     },
     body: {
       flexDirection: "row",
@@ -149,6 +149,9 @@ export default function SubClasses({ route }) {
                   navigation.navigate("ViewSubClasses", {
                     subClassId: item._id,
                     className: item.description,
+                    lat: item.latitude,
+                    lon: item.longitude,
+                    rang: item.location_range,
                   })
                 }
               >
@@ -222,17 +225,29 @@ export default function SubClasses({ route }) {
                       latitude: currentLocation.latitude,
                       longitude: currentLocation.longitude,
                     }}
-                    radius={Math.sqrt(
-                      (currentLocation.location_range * 1000000) / Math.PI
-                    )}
+                    radius={currentLocation.location_range * 1000}
                     fillColor="rgba(0, 0, 255, 0.1)"
                     strokeColor="rgba(0, 0, 255, 0.5)"
                   />
                 </MapView>
-                <Button
-                  title="Close Map"
+                <TouchableOpacity
+                  style={{
+                    height: 100,
+                    backgroundColor: darkMode ? "#444" : "#fff",
+                    padding: 5,
+                  }}
                   onPress={() => setModalVisible(false)}
-                />
+                >
+                  <Text
+                    style={{
+                      color: darkMode ? "#fff" : "#000",
+                      fontSize: 18,
+                      textAlign: "center",
+                    }}
+                  >
+                    Close
+                  </Text>
+                </TouchableOpacity>
               </Modal>
             </>
           )}

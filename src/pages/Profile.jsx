@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import {
   Text,
   View,
@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
+  Animated,
+  RefreshControl,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,6 +25,7 @@ import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 import LoadingScreen from "./LoadingScreen";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -31,13 +35,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const qrCodeRef = React.useRef();
+  const [refreshing, setRefreshing] = useState(false);
 
   const { darkMode } = useContext(ThemeContext);
-
-  useEffect(() => {
-    getUserData();
-    getCardData();
-  }, [userId]);
 
   const getUserData = async () => {
     setLoading(true);
@@ -81,6 +81,17 @@ export default function Profile() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getUserData();
+    getCardData();
+  }, [userId]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getUserData().then(() => setRefreshing(false));
+    getCardData().then(() => setRefreshing(false));
+  });
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -140,20 +151,6 @@ export default function Profile() {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {/* <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("GenerateCard", {
-                token: token,
-              })
-            }
-          >
-            <Icon
-              name="edit"
-              size={24}
-              color={darkMode ? "#fff" : "#2F3791"}
-              style={{ marginRight: 25 }}
-            />
-          </TouchableOpacity> */}
           <TouchableOpacity onPress={handleLogout}>
             <Icon
               name="sign-out"
@@ -180,7 +177,7 @@ export default function Profile() {
       objectFit: "fit",
     },
     userName: {
-      fontSize: 24,
+      fontSize: 16,
       fontWeight: "bold",
       color: darkMode ? "#fff" : "#444",
       overflow: "hidden",
@@ -298,22 +295,36 @@ export default function Profile() {
   return (
     <>
       {loading ? (
-        <LoadingScreen />
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: darkMode ? "#333" : "#fff",
+          }}
+        >
+          <ActivityIndicator size="small" color={darkMode ? "#fff" : "#444"} />
+        </View>
       ) : (
-        <ScrollView style={styles.container}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          style={styles.container}
+        >
           <View style={{ alignItems: "center" }}>
             <View style={styles.userProfileContainer}>
               <View style={styles.profileImageContainer}>
                 <Image
                   style={styles.image}
-                  source={{ uri: user.profile }}
+                  source={{ uri: `${user.profile}?t=${Date.now()}` }}
                   resizeMode="cover"
                 />
               </View>
               <View style={styles.textsContainer}>
                 <Text style={styles.userName}>
                   {user.username}{" "}
-                  {user.verified ? (
+                  {/* {user.verified ? (
                     <View
                       style={{
                         backgroundColor: "green",
@@ -325,7 +336,7 @@ export default function Profile() {
                     </View>
                   ) : (
                     <Icon name="times" size={16} color="red" />
-                  )}
+                  )} */}
                 </Text>
 
                 <Text style={styles.userEmail}>{user.email}</Text>
@@ -359,8 +370,11 @@ export default function Profile() {
               <TouchableOpacity
                 style={styles.editProfileButton}
                 onPress={() =>
-                  navigation.navigate("GenerateCard", {
+                  navigation.navigate("UpdateProfile", {
                     token: token,
+                    userId: userId,
+                    userProfile: user.profile,
+                    name: user.username,
                   })
                 }
               >

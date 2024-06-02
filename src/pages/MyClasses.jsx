@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  RefreshControl,
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +16,7 @@ import { API_URL, useUserData } from "../api/config";
 import { renderRightAction } from "./partials/Swapeable";
 import axios from "axios";
 import { ThemeContext } from "../hooks/ThemeContext";
+import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const MyClasses = () => {
@@ -22,12 +24,19 @@ const MyClasses = () => {
   const [loading, setLoading] = useState(true);
   const [classData, setClass] = useState({});
   const { token, userId } = useUserData();
+  const [refreshing, setRefreshing] = useState(false);
 
   const { darkMode } = useContext(ThemeContext);
 
   useEffect(() => {
     getClassData();
   }, [userId]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getClassData();
+    setRefreshing(false);
+  };
 
   const getClassData = async () => {
     setLoading(true);
@@ -122,7 +131,7 @@ const MyClasses = () => {
   const styles = StyleSheet.create({
     main: {
       flex: 1,
-      backgroundColor: darkMode ? "#121212" : "#fff",
+      backgroundColor: darkMode ? "#333" : "#fff",
       paddingHorizontal: 5,
     },
     container: {
@@ -131,7 +140,7 @@ const MyClasses = () => {
       borderRadius: 5,
       borderStartColor: "#2F3791",
       borderStartWidth: 7,
-      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+      backgroundColor: darkMode ? "#444" : "#f2f2f2",
     },
     content: {
       flexDirection: "row",
@@ -177,14 +186,37 @@ const MyClasses = () => {
     },
   });
 
+  const skeletonItem = () => (
+    <View style={{ margin: -2 }}>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <LinearGradient
+            colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.image}
+          />
+          <View style={styles.textView}>
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ width: 200, height: 20, borderRadius: 5 }}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.main}>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color="#eee" />
-        </View>
+        <FlatList
+          data={[1, 2, 3, 4, 5]}
+          keyExtractor={(item) => item.toString()}
+          renderItem={() => skeletonItem()}
+        />
       ) : classData.length === 0 ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -245,6 +277,14 @@ const MyClasses = () => {
               </Swipeable>
             </View>
           )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#fff"]}
+              tintColor={darkMode ? "#fff" : "#eee"}
+            />
+          }
         />
       )}
     </View>

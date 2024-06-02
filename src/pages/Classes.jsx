@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ActivityIndicator,
+  RefreshControl,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useFocusEffect } from "@react-navigation/native";
 import { API_URL, useUserData } from "../api/config";
+import { LinearGradient } from "expo-linear-gradient";
 import { ThemeContext } from "../hooks/ThemeContext";
 import { renderRightAction } from "./partials/Swapeable";
 import { Swipeable } from "react-native-gesture-handler";
@@ -20,9 +21,9 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const Classes = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [classData, setClass] = useState({});
+  const [classData, setClassData] = useState([]);
   const { token, userId } = useUserData();
-
+  const [refreshing, setRefreshing] = useState(false);
   const { darkMode } = useContext(ThemeContext);
 
   const getClassData = async () => {
@@ -38,21 +39,23 @@ const Classes = () => {
         }
       );
       const data = await response.json();
-      setClass(data);
-      setLoading(false);
+      setClassData(data);
     } catch (error) {
-      console.log(error);
-      setLoading(false);
+      console.error("Error fetching class data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getClassData();
-    }, [userId])
-  );
+  useEffect(() => {
+    getClassData();
+  }, [userId]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getClassData();
+    setRefreshing(false);
+  }, [userId]);
 
   const renderRightActions = (progress, classId) => (
     <View style={{ width: 190, flexDirection: "row" }}>
@@ -116,7 +119,7 @@ const Classes = () => {
         const newClasses = classData.filter(
           (classItem) => classItem._id !== classId
         );
-        setClass(newClasses);
+        setClassData(newClasses);
       } else {
         const errorData = await response.json();
         Alert.alert("Error", errorData.message);
@@ -130,7 +133,7 @@ const Classes = () => {
   const styles = StyleSheet.create({
     main: {
       flex: 1,
-      backgroundColor: darkMode ? "#121212" : "#fff",
+      backgroundColor: darkMode ? "#333" : "#fff",
       paddingHorizontal: 5,
     },
     container: {
@@ -139,9 +142,8 @@ const Classes = () => {
       borderRadius: 5,
       borderStartColor: "#2F3791",
       borderStartWidth: 7,
-      backgroundColor: darkMode ? "#333" : "#f2f2f2",
+      backgroundColor: darkMode ? "#444" : "#f2f2f2",
     },
-
     content: {
       flexDirection: "row",
       alignItems: "center",
@@ -168,14 +170,43 @@ const Classes = () => {
     },
   });
 
+  const SkeletonItem = () => (
+    <View style={{ margin: -2 }}>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <LinearGradient
+            colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.image}
+          />
+          <View style={styles.textView}>
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ width: 200, height: 20, borderRadius: 5 }}
+            />
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ width: 100, height: 10, marginTop: 5, borderRadius: 5 }}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.main}>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color="#eee" />
-        </View>
+        <FlatList
+          data={Array(6).fill()}
+          renderItem={SkeletonItem}
+          keyExtractor={(item, index) => index.toString()}
+        />
       ) : classData.length === 0 ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -186,53 +217,59 @@ const Classes = () => {
           </Text>
         </View>
       ) : (
-        <>
-          <FlatList
-            data={classData}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <View style={{ margin: -2 }}>
-                <Swipeable
-                  friction={2}
-                  leftThreshold={1}
-                  renderRightActions={(progress) =>
-                    renderRightActions(progress, item._id)
+        <FlatList
+          data={classData}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={{ margin: -2 }}>
+              <Swipeable
+                friction={2}
+                leftThreshold={1}
+                renderRightActions={(progress) =>
+                  renderRightActions(progress, item._id)
+                }
+              >
+                <TouchableOpacity
+                  style={styles.container}
+                  onPress={() =>
+                    navigation.navigate("SubClass", {
+                      classId: item._id,
+                      token: token,
+                      className: item.className,
+                    })
                   }
                 >
-                  <TouchableOpacity
-                    style={styles.container}
-                    onPress={() =>
-                      navigation.navigate("SubClass", {
-                        classId: item._id,
-                        token: token,
-                        className: item.className,
-                      })
-                    }
-                  >
-                    <View style={styles.content}>
-                      <Image
-                        source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
-                        style={styles.image}
-                      />
-                      <View style={styles.textView}>
-                        <Text
-                          style={styles.text}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {item.className}
-                        </Text>
-                        <Text style={styles.nameText}>
-                          Owner: {item.ownerName}
-                        </Text>
-                      </View>
+                  <View style={styles.content}>
+                    <Image
+                      source={{ uri: `${item.classProfile}?t=${Date.now()}` }}
+                      style={styles.image}
+                    />
+                    <View style={styles.textView}>
+                      <Text
+                        style={styles.text}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.className}
+                      </Text>
+                      <Text style={styles.nameText}>
+                        Owner: {item.ownerName}
+                      </Text>
                     </View>
-                  </TouchableOpacity>
-                </Swipeable>
-              </View>
-            )}
-          />
-        </>
+                  </View>
+                </TouchableOpacity>
+              </Swipeable>
+            </View>
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#fff"]}
+              tintColor={darkMode ? "#fff" : "#eee"}
+            />
+          }
+        />
       )}
     </View>
   );

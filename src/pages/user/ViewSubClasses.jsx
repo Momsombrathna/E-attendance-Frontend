@@ -1,100 +1,76 @@
 import React, { useState, useEffect, useContext } from "react";
 import { API_URL, useUserData } from "../../api/config";
-import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
-  Modal,
-  Button,
   ActivityIndicator,
   Animated,
 } from "react-native";
 import * as Location from "expo-location";
 import { ThemeContext } from "../../hooks/ThemeContext";
+import Feather from "react-native-vector-icons/Feather";
+import MapView, { Marker, Circle, Polyline } from "react-native-maps";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { showMessage } from "react-native-flash-message";
 
 export default function ViewSubClasses({ route }) {
-  const { subClassId, subClassName } = route.params;
+  const { subClassId, className, lat, lon, rang } = route.params;
   const { token, userId } = useUserData();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-  const navigation = useNavigation();
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [scaleValue] = useState(new Animated.Value(0));
   const { darkMode } = useContext(ThemeContext);
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      height: "100%",
-      backgroundColor: darkMode ? "#000" : "#fff",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    viewsContainer: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      gap: 10,
-    },
-    checkedInButton: {
-      backgroundColor: "#FF6347", // Tomato color or black
-      padding: 10,
-      borderRadius: 5,
-      elevation: 3, // for Android
-      shadowColor: "#000", // for iOS
-      shadowOffset: { width: 0, height: 2 }, // for iOS
-      shadowOpacity: 0.25, // for iOS
-      shadowRadius: 3.84, // for iOS
-    },
-    buttonText: {
-      color: "#FFF",
-      fontSize: 16,
-      textAlign: "center",
-    },
-    checkedOutButton: {
-      backgroundColor: "green", // Tomato color or black
-      padding: 10,
-      borderRadius: 5,
-      elevation: 3, // for Android
-      shadowColor: "#000", // for iOS
-      shadowOffset: { width: 0, height: 2 }, // for iOS
-      shadowOpacity: 0.25, // for iOS
-      shadowRadius: 3.84, // for iOS
-    },
-    className: {
-      fontSize: 20,
-      fontWeight: "bold",
-    },
-    error: {
-      color: "red",
-    },
-    errorShown: {
-      marginBottom: 10,
-    },
-  });
-
-  // get latitude and longitude from device automatically
-  const getLocation = async () => {
-    setLoading(true);
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setError("Permission to access location was denied");
-      return;
-    }
-
-    const location = await Location.getCurrentPositionAsync({});
-    setLatitude(location.coords.latitude);
-    setLongitude(location.coords.longitude);
-    setLoading(false);
-  };
+  const animationValue = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
-    getLocation();
+    const checkInStatus = async () => {
+      const check = await AsyncStorage.getItem(`check:${subClassId}`);
+      console.log(check);
+      setIsCheckedIn(check === subClassId);
+    };
+    checkInStatus();
+  }, [subClassId]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(animationValue, {
+          toValue: 3,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animationValue, {
+          toValue: 0.5,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [animationValue]);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        showMessage({
+          message: "Error",
+          description: "Permission to access location was denied",
+          type: "danger",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      setLatitude(location.coords.latitude);
+      setLongitude(location.coords.longitude);
+      setLoading(false);
+    };
+    fetchLocation();
   }, []);
 
   const handleCheckedIn = async () => {
@@ -115,16 +91,30 @@ export default function ViewSubClasses({ route }) {
           }),
         }
       );
+
       if (!response.ok) {
         const data = await response.json();
-        setError(data.message);
+        showMessage({
+          message: "Error",
+          description: data.message,
+          type: "danger",
+        });
         throw new Error(data.message);
-      } else {
-        Alert.alert("Success", "You have checked in successfully");
-        setIsCheckedIn(true);
       }
+
+      await AsyncStorage.setItem(`check:${subClassId}`, subClassId);
+      setIsCheckedIn(true);
+      showMessage({
+        message: "Success",
+        description: "You have successfully checked in",
+        type: "success",
+      });
     } catch (error) {
-      setError(error.message);
+      showMessage({
+        message: "Error",
+        description: error.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -148,70 +138,257 @@ export default function ViewSubClasses({ route }) {
           }),
         }
       );
+
       if (!response.ok) {
         const data = await response.json();
-        setError(data.message);
+        showMessage({
+          message: "Error",
+          description: data.message,
+          type: "danger",
+        });
         throw new Error(data.message);
-      } else {
-        Alert.alert("Success", "You have checked out successfully");
       }
+
+      await AsyncStorage.removeItem(`check:${subClassId}`);
       setIsCheckedIn(false);
+      showMessage({
+        message: "Success",
+        description: "You have successfully checked out",
+        type: "success",
+      });
     } catch (error) {
-      setError(error.message);
+      showMessage({
+        message: "Error",
+        description: error.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const startAnimation = () => {
-    Animated.timing(scaleValue, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  useEffect(() => {
-    if (isCheckedIn) {
-      startAnimation();
-    }
-  }, [isCheckedIn]);
-
-  const buttonScale = scaleValue.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.1, 1.2],
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      height: "100%",
+      backgroundColor: darkMode ? "#333" : "#fff",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    main: {
+      flex: 1,
+      width: "100%",
+      alignItems: "center",
+    },
+    map: {
+      height: "60%",
+      width: "100%",
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    mapView: {
+      height: "100%",
+      width: "100%",
+    },
+    checkContainer: {
+      marginTop: 20,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    checkText: {
+      color: "#fff",
+      fontSize: 14,
+      fontWeight: "bold",
+    },
+    loadingMap: {
+      height: "100%",
+      width: "100%",
+      backgroundColor: darkMode ? "#444" : "#eee",
+    },
+    animation: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: darkMode ? "#444" : "#eee",
+      position: "absolute",
+      transform: [
+        {
+          scale: animationValue,
+        },
+      ],
+    },
+    loadingContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 50,
+    },
   });
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#eee" />
-      ) : (
-        <>
-          <View style={styles.errorShown}>
-            {error && <Text style={styles.error}>{error}</Text>}
-          </View>
-          <View style={styles.viewsContainer}>
-            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-              <TouchableOpacity
-                style={styles.checkedInButton}
-                onPress={handleCheckedIn}
+      <View style={styles.main}>
+        <View style={styles.map}>
+          {loading ? (
+            <View style={styles.loadingMap}>
+              <ActivityIndicator
+                size="small"
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  color: "#2F3791",
+                }}
+              />
+            </View>
+          ) : (
+            <MapView
+              style={styles.mapView}
+              initialRegion={{
+                latitude: lat,
+                longitude: lon,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              <Marker
+                coordinate={{ latitude: lat, longitude: lon }}
+                title={className}
+                description="Class location"
               >
-                <Text style={styles.buttonText}>Check In</Text>
-              </TouchableOpacity>
-            </Animated.View>
+                <View
+                  style={{
+                    backgroundColor: "#2F3791",
+                    borderRadius: 50,
+                    padding: 5,
+                  }}
+                >
+                  <Feather name="map-pin" size={18} color="white" />
+                </View>
+              </Marker>
+              <Circle
+                center={{ latitude: lat, longitude: lon }}
+                radius={rang * 1000}
+                fillColor="rgba(0, 0, 255, 0.1)"
+                strokeColor="rgba(0, 0, 255, 0.5)"
+              />
+              <Marker
+                coordinate={{ latitude, longitude }}
+                title="Your location"
+                description="Your current location"
+              />
+              <Polyline
+                coordinates={[
+                  { latitude: lat, longitude: lon },
+                  { latitude, longitude },
+                ]}
+                strokeColor={
+                  isCheckedIn ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)"
+                }
+                strokeWidth={2}
+              />
+            </MapView>
+          )}
+        </View>
 
-            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+        <View style={styles.checkContainer}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Animated.View style={styles.animation} />
               <TouchableOpacity
-                style={styles.checkedOutButton}
+                style={{
+                  backgroundColor: isCheckedIn ? "#3d5875" : "#3d5875",
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <AnimatedCircularProgress
+                  size={100}
+                  width={5}
+                  fill={100}
+                  tintColor="#00e0ff"
+                  backgroundColor="#3d5875"
+                >
+                  {(fill) => (
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontSize: 10,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Loading...
+                    </Text>
+                  )}
+                </AnimatedCircularProgress>
+              </TouchableOpacity>
+            </View>
+          ) : isCheckedIn ? (
+            <View style={styles.loadingContainer}>
+              <Animated.View style={styles.animation} />
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "rgba(255, 0, 0, 0.5)",
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5,
+                  padding: 10,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
                 onPress={handleCheckedOut}
               >
-                <Text style={styles.buttonText}>Check Out</Text>
+                <Text style={styles.checkText}>Check Out</Text>
               </TouchableOpacity>
-            </Animated.View>
-          </View>
-        </>
-      )}
+            </View>
+          ) : (
+            <View style={styles.loadingContainer}>
+              <Animated.View style={styles.animation} />
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "rgba(0, 255, 0, 0.5)",
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5,
+                  padding: 10,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={handleCheckedIn}
+              >
+                <Text style={styles.checkText}>Check In</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
     </View>
   );
 }

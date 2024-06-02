@@ -4,8 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
 import withAuthProtection from "./src/context/AuthContext";
+import FlashMessage from "react-native-flash-message";
 
-import { createStackNavigator } from "@react-navigation/stack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -38,6 +38,7 @@ import CheckMember from "./src/pages/user/CheckMember";
 import ShowCode from "./src/pages/user/ShowCode";
 import QrCodeScannerJoinClass from "./src/pages/user/QrCodeScannerJoinClass";
 import ViewSubclassesMember from "./src/pages/user/ViewSubclassesMember";
+import UpdateProfile from "./src/pages/user_profiles/UpdateProfile";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import TeacherScanner from "./src/pages/user/TeacherScanner";
@@ -249,6 +250,7 @@ const QrCodeScannerJoinClassComponent = withAuthProtection(
 );
 const TeacherScannerComponent = withAuthProtection(TeacherScanner);
 const ViewSubclassesMemberComponent = withAuthProtection(ViewSubclassesMember);
+const UpdatePropertiesComponent = withAuthProtection(UpdateProfile);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -319,8 +321,12 @@ export default function App() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        fontSize: 16,
+                        fontSize: 14,
                         color: darkMode ? "#fff" : "#000",
+                        maxWidth: 150,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
                       {route.params.className}
@@ -351,6 +357,8 @@ export default function App() {
                         fontSize: 16,
                         color: darkMode ? "#fff" : "#000",
                       }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
                     >
                       {route.params.className}
                     </Text>
@@ -410,10 +418,23 @@ export default function App() {
             <Stack.Screen
               name="ViewSubClasses"
               component={ViewSubClassesComponent}
-              options={{
+              options={({ route }) => ({
                 headerShown: true,
-                title: "View Subclass",
-              }}
+                headerTitle: () => (
+                  <Text
+                    style={{
+                      maxWidth: 150,
+                      fontWeight: "600",
+                      fontSize: 16,
+                      color: darkMode ? "#fff" : "#000",
+                    }}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {route.params.className}
+                  </Text>
+                ),
+              })}
             />
             <Stack.Screen
               name="EditMySubClass"
@@ -463,8 +484,17 @@ export default function App() {
                 title: "Members",
               }}
             />
+            <Stack.Screen
+              name="UpdateProfile"
+              component={UpdatePropertiesComponent}
+              options={{
+                headerShown: true,
+                title: "Update Profile",
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
+        <FlashMessage position="top" />
       </ThemeContext.Provider>
     </GestureHandlerRootView>
   );
