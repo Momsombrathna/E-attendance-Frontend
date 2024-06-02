@@ -134,9 +134,7 @@ export default function ViewMember({ route }) {
       flex: 1,
       flexDirection: "row",
       padding: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: darkMode ? "#555" : "#eee",
-      backgroundColor: darkMode ? "#333" : "#eee",
+      backgroundColor: darkMode ? "#444" : "#eee",
       margin: 2,
       marginHorizontal: 5,
       borderRadius: 5,
@@ -207,7 +205,7 @@ export default function ViewMember({ route }) {
                       </Text>
                     </Text>
                     <Text style={styles.joinedDate}>
-                      Joined at:{" "}
+                      Created at:{" "}
                       {new Date(item.joined).toLocaleDateString("en-US", {
                         month: "long",
                         day: "2-digit",

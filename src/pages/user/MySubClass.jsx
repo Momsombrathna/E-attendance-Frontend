@@ -8,13 +8,13 @@ import {
   StyleSheet,
   Alert,
   Modal,
-  Button,
-  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { ThemeContext } from "../../hooks/ThemeContext";
 import { API_URL, useUserData } from "../../api/config";
 import { useNavigation } from "@react-navigation/native";
 import MapView, { Marker, Circle } from "react-native-maps";
+import { LinearGradient } from "expo-linear-gradient";
 import Feather from "react-native-vector-icons/Feather";
 import { Swipeable } from "react-native-gesture-handler";
 import { renderRightAction } from "../partials/Swapeable";
@@ -35,6 +35,7 @@ export default function MySubClasses({ route }) {
     longitude: 0,
     location_range: 0,
   });
+  const [refreshing, setRefreshing] = useState(false);
 
   const { darkMode } = useContext(ThemeContext);
 
@@ -57,6 +58,7 @@ export default function MySubClasses({ route }) {
       color: darkMode ? "#fff" : "#444",
       overflow: "hidden",
       width: 200,
+      borderRadius: 5,
       TextOverflow: "ellipsis",
     },
     name: {
@@ -78,7 +80,7 @@ export default function MySubClasses({ route }) {
     },
     map: {
       width: "100%",
-      height: "90%",
+      height: "95%",
     },
     body: {
       width: "90%",
@@ -150,6 +152,12 @@ export default function MySubClasses({ route }) {
       width: 160,
       borderRadius: 5,
     },
+    closeButton: {
+      height: 100,
+      alignItems: "center",
+      backgroundColor: darkMode ? "#444" : "#fff",
+      padding: 5,
+    },
   });
 
   const getSubClass = async () => {
@@ -175,11 +183,15 @@ export default function MySubClasses({ route }) {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getSubClass();
-    }, [classId])
-  );
+  useEffect(() => {
+    getSubClass();
+  }, [classId]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    getSubClass();
+    setRefreshing(false);
+  };
 
   const renderRightActions = (
     progress,
@@ -273,17 +285,97 @@ export default function MySubClasses({ route }) {
     { label: "50m", value: 0.05 },
   ];
 
+  const SkeletonItem = () => (
+    <View style={styles.subClass}>
+      <View style={styles.body}>
+        <View style={styles.name}>
+          <LinearGradient
+            colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ ...styles.subClassName, height: 20 }}
+          />
+
+          <View style={styles.dateRangeContainer}>
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                ...styles.timeFooter,
+                height: 20,
+                width: "45%",
+                marginRight: 10,
+              }}
+            />
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ ...styles.timeFooter, height: 20, width: "45%" }}
+            />
+          </View>
+
+          <View style={{ flexDirection: "row", gap: 5, marginTop: 10 }}>
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                ...styles.checkInFooter,
+                height: 20,
+                width: "20%",
+                marginRight: 10,
+              }}
+            />
+
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                ...styles.CheckOutFooter,
+                height: 20,
+                width: "20%",
+                marginRight: 10,
+              }}
+            />
+
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                ...styles.rangFooter,
+                height: 20,
+                width: "20%",
+                marginRight: 10,
+              }}
+            />
+
+            <LinearGradient
+              colors={["#cccccc", "#bbbbbb", "#cccccc"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                height: 20,
+                width: "20%",
+                borderRadius: 5,
+              }}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            color: "#2F3791",
-          }}
+        <FlatList
+          data={[1, 2, 3, 4, 5]}
+          keyExtractor={(item) => item}
+          renderItem={SkeletonItem}
         />
       ) : subClass &&
         subClass.attendance &&
@@ -426,6 +518,9 @@ export default function MySubClasses({ route }) {
               </TouchableOpacity>
             </Swipeable>
           )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
       <Modal
@@ -456,14 +551,26 @@ export default function MySubClasses({ route }) {
               latitude: currentLocation.latitude,
               longitude: currentLocation.longitude,
             }}
-            radius={Math.sqrt(
-              (currentLocation.location_range * 1000000) / Math.PI
-            )}
+            radius={currentLocation.location_range * 1000}
             fillColor="rgba(0, 0, 255, 0.1)"
             strokeColor="rgba(0, 0, 255, 0.5)"
           />
         </MapView>
-        <Button title="Close Map" onPress={() => setModalVisible(false)} />
+        <TouchableOpacity
+          onPress={() => {
+            setModalVisible(!modalVisible);
+          }}
+          style={styles.closeButton}
+        >
+          <Text
+            style={{
+              color: darkMode ? "#fff" : "#333",
+              fontSize: 18,
+            }}
+          >
+            Close
+          </Text>
+        </TouchableOpacity>
       </Modal>
     </View>
   );

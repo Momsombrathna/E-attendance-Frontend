@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   View,
@@ -30,7 +30,7 @@ export default function UpdateClass({ route }) {
 
   const styles = StyleSheet.create({
     container: {
-      backgroundColor: darkMode ? "#555" : "#FFFFFF",
+      backgroundColor: darkMode ? "#333" : "#FFFFFF",
       height: "100%",
     },
     content: {
@@ -62,7 +62,8 @@ export default function UpdateClass({ route }) {
       width: "90%",
     },
     textInput: {
-      backgroundColor: "#eee",
+      backgroundColor: darkMode ? "#444" : "#F5F5F5",
+      color: darkMode ? "#FFFFFF" : "#000000",
       height: 50,
       padding: 10,
       marginBottom: 20,
@@ -109,6 +110,17 @@ export default function UpdateClass({ route }) {
     if (!className) {
       setLoading(false);
       return setError("Class name is required");
+    }
+
+    // validate user input
+    if (className.length < 3) {
+      setLoading(false);
+      return setError("Class name must be at least 3 characters long");
+    }
+
+    if (className.length > 50) {
+      setLoading(false);
+      return setError("Class name must be at most 50 characters long");
     }
 
     if (!classImage) {
@@ -199,7 +211,12 @@ export default function UpdateClass({ route }) {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={pickImage}>
-            <Text style={{ color: "#2F3791", marginTop: 10 }}>
+            <Text
+              style={{
+                color: darkMode ? "#FFFFFF" : "#2F3791",
+                marginTop: 10,
+              }}
+            >
               Change Photo
             </Text>
           </TouchableOpacity>
@@ -234,5 +251,3 @@ export default function UpdateClass({ route }) {
     </View>
   );
 }
-
-
