@@ -466,7 +466,7 @@ export default function Profile() {
                     >
                       <Image
                         style={[styles.qrCode, { width: 80, height: 80 }]}
-                        source={{ uri: card.profile }}
+                        source={{ uri: `${card.profile}?t=${Date.now()}` }}
                       />
                       <View style={{ alignItems: "flex-end" }}>
                         <Text

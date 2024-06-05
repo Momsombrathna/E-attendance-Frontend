@@ -42,6 +42,7 @@ import UpdateProfile from "./src/pages/user_profiles/UpdateProfile";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import TeacherScanner from "./src/pages/user/TeacherScanner";
+import EditCard from "./src/pages/user/EditCard";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -238,6 +239,7 @@ const HeaderRight = ({ classId, token, code, classProfile, className }) => {
 
 const ProtectedComponent = withAuthProtection(TabNavigator);
 const GenerateCardComponent = withAuthProtection(GenerateCard);
+const EditCardComponent = withAuthProtection(EditCard);
 const CreateClassComponent = withAuthProtection(CreateClass);
 const UpdateClassComponent = withAuthProtection(UpdateClass);
 const CreateSubClassesComponent = withAuthProtection(CreateSubClasses);
@@ -382,6 +384,13 @@ export default function App() {
               component={GenerateCardComponent}
               options={{ title: "My Card" }}
             />
+
+            <Stack.Screen
+              name="EditCard"
+              component={EditCardComponent}
+              options={{ title: "My Card", headerShown: true }}
+            />
+
             <Stack.Screen
               name="CreateClass"
               component={CreateClassComponent}
