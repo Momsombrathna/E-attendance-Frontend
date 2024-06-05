@@ -373,7 +373,7 @@ export default function MySubClasses({ route }) {
     <View style={styles.container}>
       {loading ? (
         <FlatList
-          data={[1, 2, 3, 4, 5]}
+          data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
           keyExtractor={(item) => item}
           renderItem={SkeletonItem}
         />
