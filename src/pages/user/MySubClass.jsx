@@ -18,7 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Feather from "react-native-vector-icons/Feather";
 import { Swipeable } from "react-native-gesture-handler";
 import { renderRightAction } from "../partials/Swapeable";
-import { useFocusEffect } from "@react-navigation/native";
+// import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import moment from "moment";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -93,7 +93,7 @@ export default function MySubClasses({ route }) {
     },
     dateRange: {
       fontSize: 13,
-      color: darkMode ? "#fff" : "#666",
+      color: "#fff",
       alignItems: "center",
       justifyContent: "center",
       width: 150,
@@ -147,7 +147,7 @@ export default function MySubClasses({ route }) {
       borderRadius: 5,
     },
     timeFooter: {
-      backgroundColor: darkMode ? "#222" : "#fff",
+      backgroundColor: darkMode ? "#222" : "#888",
       padding: 5,
       width: 160,
       borderRadius: 5,
@@ -373,7 +373,7 @@ export default function MySubClasses({ route }) {
     <View style={styles.container}>
       {loading ? (
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
           keyExtractor={(item) => item}
           renderItem={SkeletonItem}
         />
