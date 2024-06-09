@@ -203,7 +203,7 @@ const Classes = () => {
     <View style={styles.main}>
       {loading ? (
         <FlatList
-          data={Array(6).fill()}
+          data={Array(10).fill()}
           renderItem={SkeletonItem}
           keyExtractor={(item, index) => index.toString()}
         />

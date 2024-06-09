@@ -213,7 +213,7 @@ const MyClasses = () => {
     <View style={styles.main}>
       {loading ? (
         <FlatList
-          data={[1, 2, 3, 4, 5]}
+          data={[1, 2, 3, 4, 5, 7, 8, 9, 10]}
           keyExtractor={(item) => item.toString()}
           renderItem={() => skeletonItem()}
         />

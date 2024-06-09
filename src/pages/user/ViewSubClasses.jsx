@@ -12,28 +12,33 @@ import * as Location from "expo-location";
 import { ThemeContext } from "../../hooks/ThemeContext";
 import Feather from "react-native-vector-icons/Feather";
 import MapView, { Marker, Circle, Polyline } from "react-native-maps";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { showMessage } from "react-native-flash-message";
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import TimeIcon from "../../../assets/AnimationTime.json";
+import LottieView from "lottie-react-native";
 
 export default function ViewSubClasses({ route }) {
-  const { subClassId, className, lat, lon, rang } = route.params;
+  const {
+    subClassId,
+    className,
+    lat,
+    lon,
+    rang,
+    to,
+    checkedIn,
+    checkedOut,
+    status,
+  } = route.params;
   const { token, userId } = useUserData();
   const [loading, setLoading] = useState(true);
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
   const { darkMode } = useContext(ThemeContext);
   const animationValue = useState(new Animated.Value(0))[0];
-
-  useEffect(() => {
-    const checkInStatus = async () => {
-      const check = await AsyncStorage.getItem(`check:${subClassId}`);
-      console.log(check);
-      setIsCheckedIn(check === subClassId);
-    };
-    checkInStatus();
-  }, [subClassId]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     Animated.loop(
@@ -95,23 +100,21 @@ export default function ViewSubClasses({ route }) {
       if (!response.ok) {
         const data = await response.json();
         showMessage({
-          message: "Error",
+          message: "Failed",
           description: data.message,
           type: "danger",
         });
         throw new Error(data.message);
       }
-
-      await AsyncStorage.setItem(`check:${subClassId}`, subClassId);
-      setIsCheckedIn(true);
       showMessage({
         message: "Success",
         description: "You have successfully checked in",
         type: "success",
       });
+      navigation.goBack();
     } catch (error) {
       showMessage({
-        message: "Error",
+        message: "Failed",
         description: error.message,
         type: "danger",
       });
@@ -142,23 +145,21 @@ export default function ViewSubClasses({ route }) {
       if (!response.ok) {
         const data = await response.json();
         showMessage({
-          message: "Error",
+          message: "Failed",
           description: data.message,
           type: "danger",
         });
         throw new Error(data.message);
       }
-
-      await AsyncStorage.removeItem(`check:${subClassId}`);
-      setIsCheckedIn(false);
       showMessage({
         message: "Success",
         description: "You have successfully checked out",
         type: "success",
       });
+      navigation.goBack();
     } catch (error) {
       showMessage({
-        message: "Error",
+        message: "Failed",
         description: error.message,
         type: "danger",
       });
@@ -283,7 +284,9 @@ export default function ViewSubClasses({ route }) {
                   { latitude, longitude },
                 ]}
                 strokeColor={
-                  isCheckedIn ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)"
+                  status === "present"
+                    ? "rgba(0, 255, 0, 0.5)"
+                    : "rgba(255, 0, 0, 0.5)"
                 }
                 strokeWidth={2}
               />
@@ -294,10 +297,9 @@ export default function ViewSubClasses({ route }) {
         <View style={styles.checkContainer}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <Animated.View style={styles.animation} />
-              <TouchableOpacity
+              <View
                 style={{
-                  backgroundColor: isCheckedIn ? "#3d5875" : "#3d5875",
+                  backgroundColor: darkMode ? "#444" : "#eee",
                   shadowColor: "#000",
                   shadowOffset: {
                     width: 0,
@@ -306,6 +308,7 @@ export default function ViewSubClasses({ route }) {
                   shadowOpacity: 0.25,
                   shadowRadius: 3.84,
                   elevation: 5,
+                  padding: 10,
                   width: 100,
                   height: 100,
                   borderRadius: 50,
@@ -317,74 +320,167 @@ export default function ViewSubClasses({ route }) {
                   size={100}
                   width={5}
                   fill={100}
-                  tintColor="#00e0ff"
+                  tintColor="#2F3791"
                   backgroundColor="#3d5875"
                 >
                   {(fill) => (
-                    <Text
-                      style={{
-                        color: "#fff",
-                        fontSize: 10,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Loading...
-                    </Text>
+                    <View>
+                      <LottieView
+                        source={TimeIcon}
+                        autoPlay
+                        loop
+                        style={{ width: 80, height: 80 }}
+                      />
+                    </View>
                   )}
                 </AnimatedCircularProgress>
-              </TouchableOpacity>
-            </View>
-          ) : isCheckedIn ? (
-            <View style={styles.loadingContainer}>
-              <Animated.View style={styles.animation} />
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "rgba(255, 0, 0, 0.5)",
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  elevation: 5,
-                  padding: 10,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={handleCheckedOut}
-              >
-                <Text style={styles.checkText}>Check Out</Text>
-              </TouchableOpacity>
+              </View>
             </View>
           ) : (
-            <View style={styles.loadingContainer}>
-              <Animated.View style={styles.animation} />
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "rgba(0, 255, 0, 0.5)",
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  elevation: 5,
-                  padding: 10,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={handleCheckedIn}
-              >
-                <Text style={styles.checkText}>Check In</Text>
-              </TouchableOpacity>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {moment(to).isBefore(moment()) ? (
+                <>
+                  <View style={styles.loadingContainer}>
+                    <View
+                      style={{
+                        backgroundColor: "rgba(255, 0, 0, 0.5)",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                        padding: 10,
+                        width: 100,
+                        height: 100,
+                        borderRadius: 50,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Feather name="alert-circle" size={50} color="#eee" />
+                    </View>
+                  </View>
+                  <Text
+                    style={{
+                      color: "rgba(255, 0, 0, 0.5)",
+                      fontSize: 14,
+                      marginTop: 30,
+                      justifyContent: "center",
+                    }}
+                  >
+                    Class has Ended
+                  </Text>
+                </>
+              ) : status === "present" ? (
+                <>
+                  <View style={styles.loadingContainer}>
+                    <View
+                      style={{
+                        backgroundColor: "rgba(0, 255, 0, 0.5)",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                        padding: 10,
+                        width: 100,
+                        height: 100,
+                        borderRadius: 50,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Feather
+                        name="check-circle"
+                        size={50}
+                        color="#eee"
+                        style={{ marginTop: 5 }}
+                      />
+                    </View>
+                  </View>
+                  <Text
+                    style={{
+                      color: "rgba(0, 255, 0, 0.5)",
+                      fontSize: 14,
+                      marginTop: 30,
+                      justifyContent: "center",
+                    }}
+                  >
+                    You are Present
+                  </Text>
+                </>
+              ) : status === "absent" ? (
+                <View>
+                  {checkedIn === false ? (
+                    <View style={styles.loadingContainer}>
+                      <Animated.View style={styles.animation} />
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "rgba(0, 255, 0, 0.5)",
+                          shadowColor: "#000",
+                          shadowOffset: {
+                            width: 0,
+                            height: 2,
+                          },
+                          shadowOpacity: 0.25,
+                          shadowRadius: 3.84,
+                          elevation: 5,
+                          padding: 10,
+                          width: 100,
+                          height: 100,
+                          borderRadius: 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        onPress={handleCheckedIn}
+                      >
+                        <Text style={styles.checkText}>Check In</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={styles.loadingContainer}>
+                      <Animated.View style={styles.animation} />
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "rgba(255, 0, 0, 0.5)",
+                          shadowColor: "#000",
+                          shadowOffset: {
+                            width: 0,
+                            height: 2,
+                          },
+                          shadowOpacity: 0.25,
+                          shadowRadius: 3.84,
+                          elevation: 5,
+                          padding: 10,
+                          width: 100,
+                          height: 100,
+                          borderRadius: 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        onPress={handleCheckedOut}
+                      >
+                        <Text style={styles.checkText}>Check Out</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View>
+                  <Text style={styles.checkText}>Class Ended</Text>
+                </View>
+              )}
             </View>
           )}
         </View>
