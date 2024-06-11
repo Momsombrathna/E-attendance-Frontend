@@ -109,7 +109,6 @@ export default function CheckMember({ route }) {
   return (
     <View style={styles.main}>
       <FlatList
-        numColumns={2}
         data={Object.entries(item.attendances)}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) =>
