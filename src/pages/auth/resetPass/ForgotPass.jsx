@@ -48,7 +48,7 @@ export default function ForgotPass() {
         navigation.navigate("VerifyEmailResetPass", { email });
       } else {
         setLoading(false);
-        setError("An error occurred. Please try again.");
+        setError(response.data.message);
       }
     } catch (error) {
       setLoading(false);
@@ -169,6 +169,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#2F3791",
     padding: 15,
+    height: 50,
+    justifyContent: "center",
     alignItems: "center",
     opacity: 0.9,
     borderRadius: 10,

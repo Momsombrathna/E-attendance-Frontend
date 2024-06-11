@@ -10,98 +10,157 @@ import {
   Alert,
   Button,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+
 import { ThemeContext } from "../../hooks/ThemeContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Feather from "react-native-vector-icons/Feather";
 import { API_URL, useUserData } from "../../api/config";
-import { CameraView, Camera } from "expo-camera";
-import * as Location from "expo-location";
+import { showMessage } from "react-native-flash-message";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
 export default function TeacherScanner({ route }) {
-  const { userId, token } = useUserData();
-  const [studentId, setStudentId] = useState("Not yet Scanned");
+  const { token } = useUserData();
   const { item } = route.params;
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
-  const navigation = useNavigation();
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const { darkMode } = useContext(ThemeContext);
-  const [facing, setFacing] = useState("front");
-
-  const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const { darkMode } = useContext(ThemeContext);
+  const [facing, setFacing] = useState("back");
+  const [cameraView, setCameraView] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: darkMode ? "#000" : "#fff",
-      marginTop: 20,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    barcodebox: {
-      width: 300,
-      height: 300,
-      backgroundColor: darkMode ? "#000" : "#fff",
-      justifyContent: "center",
-      alignItems: "center",
-      overflow: "hidden",
-      borderRadius: 10,
-      borderColor: darkMode ? "#000" : "#fff",
-      borderWidth: 2,
-    },
-    rowContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-around",
-    },
-    text: {
-      color: darkMode ? "#fff" : "#000",
-      fontSize: 16,
-      margin: 10,
-    },
-  });
+  if (!permission) {
+    return <ActivityIndicator />;
+  }
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet.
+    return (
+      <View
+        style={{
+          height: 500,
+          backgroundColor: "#eee",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to show the camera
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#2F3791",
+            padding: 10,
+            borderRadius: 5,
+          }}
+          onPress={requestPermission}
+        >
+          <Text style={{ color: "#fff" }}>Allow Camera</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
-  const askForCameraPermission = () => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  };
+  const styles = StyleSheet.create({
+    main: {
+      flex: 1,
+      backgroundColor: darkMode ? "#000" : "#fff",
+    },
+    container: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    camera: {
+      width: 400,
+      height: 600,
+    },
+    cameraContainer: {
+      overflow: "hidden",
 
-  // Request Camera Permission
+      width: 500,
+      height: 500,
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    button: {
+      backgroundColor: "#2F3791",
+      padding: 10,
+      margin: 10,
+      borderRadius: 5,
+    },
+    text: {
+      color: "#fff",
+      fontSize: 16,
+    },
+    errorText: {
+      color: "red",
+      fontSize: 16,
+    },
+    scannerContainer: {
+      flex: 1,
+      alignItems: "center",
+    },
+    errorContainer: {
+      height: 30,
+      marginTop: 10,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    headerScanner: {
+      marginTop: 20,
+      fontSize: 18,
+      color: "#fff",
+    },
+    text: {
+      fontSize: 18,
+      color: "#fff",
+    },
+    nameText: {
+      marginTop: 5,
+      fontSize: 14,
+      color: darkMode ? "#999" : "#777",
+    },
+    textView: {
+      justifyContent: "center",
+      flexDirection: "column",
+    },
+    loadingView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    cameraButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 10,
+    },
+    cameraBtn: {
+      backgroundColor: "#2F3791",
+      padding: 10,
+      borderRadius: 5,
+      margin: 10,
+      gap: 10,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+  });
 
-  //what happen when we scan the barcode
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    setStudentId(data);
-    console.log(" Type: " + type + "\n Data: " + data);
-  };
-
-  const getLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Permission to access location was denied");
-        return;
-      }
-      const location = await Location.getCurrentPositionAsync({});
-      setLatitude(location.coords.latitude);
-      setLongitude(location.coords.longitude);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleCheckedIn = async (studentId) => {
+  const handleCheckedIn = async (id) => {
     setLoading(true);
+
+    if (!id) {
+      setError("Please scan the QR code first");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_URL}/attendance/checked-in/${item._id}`,
@@ -112,29 +171,44 @@ export default function TeacherScanner({ route }) {
             "auth-token": token,
           },
           body: JSON.stringify({
-            studentId: studentId,
-            latitude,
-            longitude,
+            studentId: id,
+            latitude: item.latitude,
+            longitude: item.longitude,
           }),
         }
       );
       if (!response.ok) {
         const data = await response.json();
-        setError(data.message);
+        showMessage({
+          message: data.message,
+          type: "danger",
+        });
         throw new Error(data.message);
       } else {
-        Alert.alert("Success", "You have checked in successfully");
+        showMessage({
+          message: data.message,
+          type: "success",
+        });
         setIsCheckedIn(true);
       }
     } catch (error) {
-      setError(error.message);
+      showMessage({
+        message: error.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
+      setScanned(false);
     }
   };
 
-  const handleCheckedOut = async (studentId) => {
+  const handleCheckedOut = async (id) => {
     setLoading(true);
+
+    if (!id) {
+      setError("Please scan the QR code first");
+      return;
+    }
     try {
       const response = await fetch(
         `${API_URL}/attendance/checked-out/${item._id}`,
@@ -145,82 +219,181 @@ export default function TeacherScanner({ route }) {
             "auth-token": token,
           },
           body: JSON.stringify({
-            studentId: studentId,
-            latitude,
-            longitude,
+            studentId: id,
+            latitude: item.latitude,
+            longitude: item.longitude,
           }),
         }
       );
       if (!response.ok) {
         const data = await response.json();
-        setError(data.message);
+        showMessage({
+          message: data.message,
+          type: "danger",
+        });
         throw new Error(data.message);
       } else {
-        Alert.alert("Success", "You have checked out successfully");
+        showMessage({
+          message: data.message,
+          type: "success",
+        });
       }
-      setIsCheckedIn(false);
     } catch (error) {
-      setError(error.message);
+      showMessage({
+        message: error.message,
+        type: "danger",
+      });
     } finally {
       setLoading(false);
+      setScanned(false);
     }
   };
 
-  useEffect(() => {
-    askForCameraPermission();
-    getLocation();
-  }, []);
+  const handleOpenCheckInCamera = ({ data }) => {
+    setCameraView("checkIn");
+    setScanned(true);
+    handleCheckedIn(data);
+  };
 
-  //Check permission and return the screens
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-  if (hasPermission === false) {
-    return (
-      <View style={styles.container}>
-        <Text>No access to camera</Text>
-        <Button title="Allow Camera" onPress={() => askForCameraPermission()} />
-      </View>
-    );
-  }
+  const handleOpenCheckOutCamera = ({ data }) => {
+    setCameraView("checkOut");
+    setScanned(true);
+    handleCheckedOut(data);
+  };
+  console.log(item.to);
 
   return (
-    <View style={styles.container}>
-      {/* <View style={styles.rowContainer}>
-        <Button
-          title="Check In"
-          onPress={() => {
-            setScanned(false);
+    <View style={styles.main}>
+      {Date.now() > new Date(item.to) ? (
+        <View
+          style={{
+            marginTop: 100,
+            justifyContent: "center",
+            alignItems: "center",
           }}
-        />
-        <Button
-          title="Check Out"
-          onPress={() => {
-            setScanned(false);
-          }}
-        />
-      </View> */}
-      {!scanned && (
-        <View style={styles.barcodebox}>
-          <CameraView
-            bounds="qr-code"
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-            style={{ height: 400, width: 400 }}
-            facing={facing}
+        >
+          <Feather
+            name="alert-triangle"
+            size={100}
+            color={darkMode ? "#444" : "#333"}
           />
+          <Text
+            style={{
+              color: darkMode ? "#444" : "#333",
+              fontSize: 16,
+              marginTop: 10,
+            }}
+          >
+            This class has ended
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.cameraButton}>
+            <TouchableOpacity
+              style={{
+                ...styles.cameraBtn,
+                backgroundColor:
+                  cameraView === "checkIn" ? "rgba(0, 255, 0, 0.5)" : "#444",
+              }}
+              onPress={() => setCameraView("checkIn")}
+            >
+              <Feather name="log-in" size={24} color={styles.text.color} />
+              <Text style={styles.text}>Check In</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.cameraBtn,
+                backgroundColor:
+                  cameraView === "checkOut" ? "rgba(255, 0, 0, 0.5)" : "#444",
+              }}
+              onPress={() => setCameraView("checkOut")}
+            >
+              <Feather name="log-out" size={24} color={styles.text.color} />
+              <Text style={styles.text}>Check Out</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cameraContainer}>
+            {cameraView === "checkIn" ? (
+              <CameraView
+                onBarcodeScanned={scanned ? undefined : handleOpenCheckInCamera}
+                barcodeScannerSettings={{
+                  barcodeTypes: ["qr", "pdf417"],
+                }}
+                style={StyleSheet.absoluteFillObject}
+                facing={facing}
+              >
+                <View style={styles.scannerContainer}>
+                  <Text style={styles.headerScanner}>
+                    Scan the QR code to check in
+                  </Text>
+                  <View style={styles.loadingView}>
+                    {loading ? (
+                      <ActivityIndicator size="large" color="#fff" />
+                    ) : null}
+                  </View>
+                </View>
+              </CameraView>
+            ) : cameraView === "checkOut" ? (
+              cameraView === "checkOut" && (
+                <CameraView
+                  onBarcodeScanned={
+                    scanned ? undefined : handleOpenCheckOutCamera
+                  }
+                  barcodeScannerSettings={{
+                    barcodeTypes: ["qr", "pdf417"],
+                  }}
+                  style={StyleSheet.absoluteFillObject}
+                  facing={facing}
+                >
+                  <View style={styles.scannerContainer}>
+                    <Text style={styles.headerScanner}>
+                      Scan the QR code to check out
+                    </Text>
+                    <View style={styles.loadingView}>
+                      {loading ? (
+                        <ActivityIndicator size="large" color="#fff" />
+                      ) : null}
+                    </View>
+                  </View>
+                </CameraView>
+              )
+            ) : (
+              <View style={styles.scannerContainer}>
+                <Text style={styles.headerScanner}>Scan the QR code</Text>
+                <View style={styles.loadingView}>
+                  <Feather
+                    name="camera-off"
+                    size={100}
+                    color={darkMode ? "#fff" : "#000"}
+                  />
+                  <Text
+                    style={{
+                      color: darkMode ? "#fff" : "#000",
+                      fontSize: 16,
+                      marginTop: 10,
+                    }}
+                  >
+                    Please select an option above
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={toggleCameraFacing}
+            >
+              <MaterialCommunityIcons
+                name="camera-switch"
+                size={24}
+                color={styles.text.color}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
-      <Text style={styles.text}>Checked In Successfully {} </Text>
-      {scanned && (
-        <Button title="Scan again?" onPress={() => setScanned(false)} />
-      )}
-      <TouchableOpacity onPress={toggleCameraFacing}>
-        <MaterialCommunityIcons
-          name="camera-switch"
-          size={24}
-          color={styles.text.color}
-        />
-      </TouchableOpacity>
     </View>
   );
 }

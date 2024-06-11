@@ -203,7 +203,7 @@ export default function Profile() {
     card: {
       padding: 10,
       width: "90%",
-      height: 200,
+      height: 210,
       borderRadius: 5,
       marginTop: 25,
       marginBottom: 5,
@@ -223,9 +223,7 @@ export default function Profile() {
     qrCode: {
       width: 100,
       height: 100,
-      borderRadius: 10,
-      borderColor: "black",
-      borderWidth: 1,
+      borderRadius: 5,
     },
     qrCodeContainer: {
       width: 100,
@@ -469,21 +467,31 @@ export default function Profile() {
                         source={{ uri: `${card.profile}?t=${Date.now()}` }}
                       />
                       <View style={{ alignItems: "flex-end" }}>
-                        <Text
-                          style={[
-                            styles.text,
-                            {
-                              fontSize: 12,
-                              backgroundColor: user.verified ? "green" : "red",
-                              padding: 5,
-                              borderRadius: 5,
-                            },
-                          ]}
+                        <View
+                          style={
+                            user.verified === true
+                              ? {
+                                  backgroundColor: "green",
+                                  padding: 5,
+                                  borderRadius: 5,
+                                  marginBottom: 5,
+                                }
+                              : {
+                                  backgroundColor: "red",
+                                  padding: 5,
+                                  borderRadius: 5,
+                                  marginBottom: 5,
+                                }
+                          }
                         >
-                          {user.verified ? "Verified" : "Not Verified"}
-                        </Text>
+                          <Text style={{ color: "white" }}>
+                            {user.verified === true
+                              ? "Verified"
+                              : "Not Verified"}
+                          </Text>
+                        </View>
                         <Text style={styles.text}>
-                          Student ID: {hashUserId(card.userId)}
+                          ID: {hashUserId(card.userId)}
                         </Text>
                       </View>
                     </View>
@@ -547,7 +555,6 @@ export default function Profile() {
                               backgroundColor="#fff"
                               color="#000"
                               padding={10}
-                              logo={{ uri: card.profile }}
                             />
                           </ViewShot>
                           <TouchableOpacity
@@ -572,7 +579,16 @@ export default function Profile() {
                       <TouchableOpacity
                         onPress={() => setImageModalVisible(true)}
                       >
-                        <View style={styles.qrCodeContainer}>
+                        <View
+                          style={{
+                            width: 110,
+                            height: 110,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginBottom: 10,
+                            backgroundColor: "white",
+                          }}
+                        >
                           <QRCode value={card.userId} />
                         </View>
                         {/* <Image

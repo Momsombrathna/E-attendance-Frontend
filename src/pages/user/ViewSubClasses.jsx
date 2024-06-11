@@ -299,15 +299,8 @@ export default function ViewSubClasses({ route }) {
             <View style={styles.loadingContainer}>
               <View
                 style={{
-                  backgroundColor: darkMode ? "#444" : "#eee",
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  elevation: 5,
+                  backgroundColor: darkMode ? "#444" : "#fff",
+
                   padding: 10,
                   width: 100,
                   height: 100,
@@ -318,10 +311,10 @@ export default function ViewSubClasses({ route }) {
               >
                 <AnimatedCircularProgress
                   size={100}
+                  duration={loading ? 5000 : 0}
                   width={5}
                   fill={100}
                   tintColor="#2F3791"
-                  backgroundColor="#3d5875"
                 >
                   {(fill) => (
                     <View>
