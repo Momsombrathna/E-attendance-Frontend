@@ -105,6 +105,7 @@ export default function Login() {
                 style={styles.inputUsername}
                 value={username}
                 onChangeText={setUsername}
+                placeholderTextColor={"gray"}
                 placeholder="Username or Email"
               />
             </View>
@@ -119,6 +120,7 @@ export default function Login() {
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Password"
+                placeholderTextColor={"gray"}
                 secureTextEntry={!isPasswordVisible}
               />
               <TouchableOpacity
