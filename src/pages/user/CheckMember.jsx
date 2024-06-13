@@ -5,13 +5,18 @@ import {
   StyleSheet,
   Image,
   FlatList,
+  Alert,
   TouchableOpacity,
 } from "react-native";
 import { ThemeContext } from "../../hooks/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
+import { FontAwesome } from "@expo/vector-icons";
 import moment from "moment";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import XLSX from "xlsx";
 
 export default function CheckMember({ route }) {
   const { item } = route.params;
@@ -88,16 +93,77 @@ export default function CheckMember({ route }) {
     },
   });
 
+  const data = Object.entries(item.attendances)
+    .filter(([key, value]) => key !== "0")
+    .map(([key, value]) => {
+      return {
+        studentName: value.studentName,
+        status: value.status,
+        checkedIn: value.checkedIn,
+        checkedInTime:
+          value.checkedInTime === null
+            ? "No"
+            : moment(value.checkedInTime).format("ddd,MM YYYY HH:MM"),
+        checkedOut: value.checkedOut,
+        checkedOutTime:
+          value.checkedOutTime === null
+            ? "No"
+            : moment(value.checkedOutTime).format("ddd,MM YYYY HH:MM"),
+      };
+    });
+
+  // export attendances to excel file
+  const exportToExcel = async () => {
+    try {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        `E-Attendance of ${item.description}.xlsx`
+      );
+      const wbout = XLSX.write(wb, {
+        type: "base64",
+        bookType: "xlsx",
+      });
+      const uri =
+        FileSystem.cacheDirectory + `E-Attendance of ${item.description}.xlsx`;
+      await FileSystem.writeAsStringAsync(uri, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      await Sharing.shareAsync(uri, {
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        dialogTitle: `E-Attendance of ${item.description}`,
+        UTI: "com.microsoft.excel.xlsx",
+      });
+
+      await FileSystem.deleteAsync(uri);
+    } catch (error) {
+      Alert.alert("Error", "Failed to export to excel file");
+    }
+  };
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 20,
+            paddingRight: 10,
+          }}
+        >
+          <TouchableOpacity onPress={exportToExcel}>
+            <FontAwesome name="file-excel-o" size={24} color="#2F3791" />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("TeacherScanner", { item })}
           >
             <MaterialCommunityIcons
               name="qrcode-scan"
-              size={30}
+              size={24}
               color="#2F3791"
             />
           </TouchableOpacity>

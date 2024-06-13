@@ -22,6 +22,10 @@ import { renderRightAction } from "../partials/Swapeable";
 import axios from "axios";
 import moment from "moment";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { FontAwesome } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import XLSX from "xlsx";
 
 export default function MySubClasses({ route }) {
   const { classId, token, code, className, classProfile } = route.params;
@@ -186,6 +190,66 @@ export default function MySubClasses({ route }) {
   useEffect(() => {
     getSubClass();
   }, [classId]);
+
+  const exportToExcel = async () => {
+    const data = subClass.attendance.map((item) => {
+      const now = moment();
+      const created = moment(item.created);
+      const started = moment(item.from);
+      const ended = moment(item.to);
+
+      let status;
+      if (started.isAfter(now)) {
+        status = "Not Started";
+      } else if (ended.isBefore(now)) {
+        status = "Ended";
+      } else {
+        status = "Ongoing";
+      }
+
+      return {
+        Description: item.description,
+        From: moment(item.from).format("MMM DD,YYYY hh:mm A"),
+        To: moment(item.to).format("MMM DD,YYYY hh:mm A"),
+        Status: status,
+        LocationRange: locationRanges.find(
+          (range) => range.value === item.location_range
+        ).label,
+        Latitude: item.latitude,
+        Longitude: item.longitude,
+      };
+    });
+
+    try {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        `SubClasses of ${subClass.class_name}.xlsx`
+      );
+      const wbout = XLSX.write(wb, {
+        type: "base64",
+        bookType: "xlsx",
+      });
+
+      const uri = FileSystem.cacheDirectory + "SubClasses.xlsx";
+      await FileSystem.writeAsStringAsync(uri, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      await Sharing.shareAsync(uri, {
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        dialogTitle: `SubClasses of ${subClass.class_name}`,
+        UTI: "com.microsoft.excel.xlsx",
+      });
+
+      await FileSystem.deleteAsync(uri);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
