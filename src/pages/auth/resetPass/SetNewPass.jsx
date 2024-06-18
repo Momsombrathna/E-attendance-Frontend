@@ -120,6 +120,7 @@ export default function SetNewPass({ route }) {
               style={styles.inputPassword}
               value={password}
               onChangeText={setPassword}
+              placeholderTextColor={"gray"}
               placeholder="Password"
             />
             <TouchableOpacity
@@ -142,6 +143,7 @@ export default function SetNewPass({ route }) {
               style={styles.inputPassword}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
+              placeholderTextColor={"gray"}
               placeholder="Confirm Password"
             />
             <TouchableOpacity

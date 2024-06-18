@@ -80,6 +80,7 @@ export default function ForgotPass() {
               style={styles.inputUsername}
               value={email}
               onChangeText={setEmail}
+              placeholderTextColor={"gray"}
               placeholder="Email"
             />
           </View>
