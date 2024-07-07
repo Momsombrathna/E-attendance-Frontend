@@ -25,8 +25,8 @@ Clone this repository to your local machine using the command:
 ```bash
 git clone https://github.com/Momsombrathna/E-attendance-Frontend.git
 
-### Step 3: Create `.env` File
 ```
+### Step 3: Create `.env` File
 Create a `.env` file in the root directory of the project and add your environment variables. Example:
 
 ```env
