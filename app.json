@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "E-attendance",
-    "slug": "e-attendance-frontend",
+    "slug": "e-attendance-mob",
     "version": "1.0.0",
     "sdkVersion": "52.0.0",
     "orientation": "portrait",
@@ -27,7 +27,9 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ],
       "package": "com.vic_07.eattendancefrontend"
     },
@@ -36,7 +38,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "2552f97f-b7d9-42e8-b51b-32e394f5680f"
+        "projectId": "f6f75599-37a1-4800-bccf-818dec61a51b"
       }
     },
     "plugins": [
@@ -48,6 +50,7 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "owner": "brathna"
   }
 }
