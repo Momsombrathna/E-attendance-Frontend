@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 
 const API_URL = E_ATTENDANCE_DEPLOY_URL;
 
+// console.log("API_URL", API_URL);
+
 if (!API_URL) {
   throw new Error("API is not defined");
 }
