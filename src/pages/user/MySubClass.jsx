@@ -337,17 +337,10 @@ export default function MySubClasses({ route }) {
     }
   };
 
-  const locationRanges = [
-    { label: "10m", value: 0.01 },
-    { label: "15m", value: 0.015 },
-    { label: "20m", value: 0.02 },
-    { label: "25m", value: 0.025 },
-    { label: "30m", value: 0.03 },
-    { label: "35m", value: 0.035 },
-    { label: "40m", value: 0.04 },
-    { label: "45m", value: 0.045 },
-    { label: "50m", value: 0.05 },
-  ];
+  const locationRanges = (range) => {
+    const Location = range * 1000;
+    return `${Location}m`;
+  };
 
   const SkeletonItem = () => (
     <View style={styles.subClass}>
@@ -514,18 +507,16 @@ export default function MySubClasses({ route }) {
                     >
                       <View style={styles.checkInFooter}>
                         <Text style={styles.locationRange}>
-                          Check in:{" "}
                           {
                             item.attendances.filter(
                               (attendance) => attendance.checkedIn
                             ).length
-                          }{" "}
+                          }
                         </Text>
                       </View>
 
                       <View style={styles.CheckOutFooter}>
                         <Text style={styles.locationRange}>
-                          Check out:{" "}
                           {
                             item.attendances.filter(
                               (attendance) => attendance.checkedOut
@@ -535,12 +526,7 @@ export default function MySubClasses({ route }) {
                       </View>
                       <View style={styles.rangFooter}>
                         <Text style={styles.locationRange}>
-                          Range:{" "}
-                          {
-                            locationRanges.find(
-                              (range) => range.value === item.location_range
-                            ).label
-                          }
+                          {locationRanges(item.location_range)}
                         </Text>
                       </View>
                       <TouchableOpacity
